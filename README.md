@@ -1,43 +1,115 @@
-# Astro Starter Kit: Minimal
+# Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+Personal portfolio built with Astro, TypeScript, and Tailwind CSS.
+
+## Features
+
+- ✨ Built with [Astro](https://astro.build) (latest version)
+- 🎨 Styled with [Tailwind CSS v4](https://tailwindcss.com)
+- 🌙 Dark mode support
+- 📝 Markdown-based content with Content Collections
+- 🎬 Smooth page transitions with View Transitions
+- 📊 Analytics ready (Vercel Analytics)
+- 🎯 TypeScript for type safety
+- 🚀 Optimized for performance
+
+## Project Structure
+
 ```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
 /
-├── public/
+├── public/           # Static assets
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/   # Reusable components
+│   ├── content/      # Markdown content
+│   │   ├── work/     # Work/case studies
+│   │   └── projects/ # Playground projects
+│   ├── layouts/      # Page layouts
+│   ├── pages/        # Routes
+│   │   ├── index.astro      # Work page (homepage)
+│   │   ├── about.astro      # About page
+│   │   ├── playground.astro # Playground page
+│   │   └── playlists.astro  # Playlists page
+│   └── styles/       # Global styles
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Getting Started
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+Install dependencies:
 
-Any static assets, like images, can be placed in the `public/` directory.
+```bash
+npm install
+```
 
-## 🧞 Commands
+Start the development server:
 
-All commands are run from the root of the project, from a terminal:
+```bash
+npm run dev
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+Build for production:
 
-## 👀 Want to learn more?
+```bash
+npm run build
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Preview production build:
+
+```bash
+npm run preview
+```
+
+## Adding Content
+
+### Work/Case Studies
+
+Add new work items in `src/content/work/` as Markdown files:
+
+```markdown
+---
+title: "Project Name"
+description: "Brief description"
+publishedAt: 2024-01-15
+featured: true
+tags: ["Design", "Development"]
+role: "Product Designer"
+company: "Company Name"
+year: "2024"
+---
+
+Your content here...
+```
+
+### Playground Projects
+
+Add experiments in `src/content/projects/`:
+
+```markdown
+---
+title: "Experiment Name"
+description: "What it does"
+publishedAt: 2024-02-01
+tags: ["React", "TypeScript"]
+url: "https://example.com"
+github: "https://github.com/username/repo"
+---
+
+Project details...
+```
+
+## Customization
+
+- Update personal info in `src/layouts/BaseLayout.astro`
+- Modify navigation in `src/components/Navigation.astro`
+- Adjust colors in `src/styles/global.css`
+- Add your own content in `src/content/`
+
+## Deployment
+
+This project is optimized for deployment on [Vercel](https://vercel.com) but works with any static hosting platform.
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/portfolio)
+
+## License
+
+MIT

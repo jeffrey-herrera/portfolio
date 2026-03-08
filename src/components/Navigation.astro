@@ -1,0 +1,41 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { href: '/', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/playground', label: 'Playground' },
+  { href: '/playlists', label: 'Playlists' },
+];
+---
+
+<nav class="border-b border-zinc-200 dark:border-zinc-800">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-8">
+        <a href="/" class="text-lg font-semibold hover:text-zinc-600 dark:hover:text-zinc-400 transition-colors">
+          JH
+        </a>
+
+        <div class="hidden md:flex gap-6">
+          {navItems.map((item) => (
+            <a
+              href={item.href}
+              class={`text-sm transition-colors ${
+                currentPath === item.href
+                  ? 'text-zinc-900 dark:text-zinc-100 font-medium'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
+              }`}
+            >
+              {item.label}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <ThemeToggle />
+    </div>
+  </div>
+</nav>

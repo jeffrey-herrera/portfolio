@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allProjects = await getCollection('projects');
+const sortedProjects = allProjects.sort(
+  (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf()
+);
+---
+
+<BaseLayout title="Playground - Jeff Herrera">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">
+        Playground
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl">
+        Side projects, experiments, and explorations.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {sortedProjects.length === 0 ? (
+        <div class="col-span-2 text-center py-16">
+          <p class="text-zinc-500 dark:text-zinc-400 mb-4">
+            No projects yet. Add your experiments in <code class="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded">src/content/projects/</code>
+          </p>
+        </div>
+      ) : (
+        sortedProjects.map((project) => (
+          <article class="group border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            {project.data.cover && (
+              <img
+                src={project.data.cover}
+                alt={project.data.title}
+                class="rounded-lg mb-4 w-full aspect-video object-cover"
+              />
+            )}
+            <h2 class="text-xl font-semibold mb-2 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+              {project.data.title}
+            </h2>
+            <p class="text-zinc-600 dark:text-zinc-400 mb-4">
+              {project.data.description}
+            </p>
+            {project.data.tags.length > 0 && (
+              <div class="flex flex-wrap gap-2 mb-4">
+                {project.data.tags.map((tag) => (
+                  <span class="px-2 py-1 text-xs rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div class="flex gap-4">
+              {project.data.url && (
+                <a
+                  href={project.data.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                >
+                  View Project →
+                </a>
+              )}
+              {project.data.github && (
+                <a
+                  href={project.data.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+                >
+                  GitHub →
+                </a>
+              )}
+            </div>
+          </article>
+        ))
+      )}
+    </div>
+  </div>
+</BaseLayout>
