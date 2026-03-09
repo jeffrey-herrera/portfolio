@@ -1,0 +1,188 @@
+---
+import '../styles/global.css';
+import { ViewTransitions } from 'astro:transitions';
+import Analytics from '../components/Analytics.astro';
+import Sidebar from '../components/Sidebar.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Jeff Herrera — Creative Director',
+  description = 'Jeff Herrera is a Creative Director based in NYC, crafting lasting brands across physical & digital.',
+} = Astro.props;
+
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <ViewTransitions />
+
+    <!-- Dark mode: runs before paint to prevent flash -->
+    <script is:inline>
+      const saved = typeof localStorage !== 'undefined' && localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList[saved === 'dark' || (!saved && prefersDark) ? 'add' : 'remove']('dark');
+      if (typeof localStorage !== 'undefined') {
+        new MutationObserver(() => {
+          localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      }
+    </script>
+  </head>
+
+  <body class="overflow-x-hidden">
+    <div class="page-root">
+      <div class="page-layout">
+        <Sidebar currentPath={currentPath} />
+        <slot />
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+
+        <div class="footer-hero">
+          <span class="footer-label">JEFF HERRERA</span>
+
+          <div class="footer-text">
+            <div class="footer-row">
+              <span class="footer-word footer-word--serif">You</span>
+              <span class="footer-word footer-word--serif">reached</span>
+              <span class="footer-word footer-word--sans">THE</span>
+              <span class="footer-word footer-word--sans">END,</span>
+            </div>
+            <div class="footer-row">
+              <span class="footer-word footer-word--sans">LET'S</span>
+              <span class="footer-word footer-word--sans">make</span>
+              <span class="footer-word footer-word--sans">it</span>
+              <span class="footer-word footer-word--serif">a</span>
+              <span class="footer-word footer-word--serif">beginning.</span>
+            </div>
+          </div>
+
+          <span class="footer-label">DESIGN DIRECTOR</span>
+        </div>
+
+        <a href="mailto:hello@jeffherrera.com" class="footer-cta">
+          →&nbsp; Let's Talk
+        </a>
+
+      </div>
+    </footer>
+
+    <Analytics />
+  </body>
+</html>
+
+<style>
+  .page-root {
+    background: var(--color-cream);
+    min-height: 100vh;
+  }
+
+  .page-layout {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    position: relative;
+  }
+
+  /* ── Footer ─────────────────────────────────────────────────────────── */
+  .site-footer {
+    background: radial-gradient(ellipse 80% 70% at 50% 110%, var(--color-orange-900) 0%, var(--color-orange-950) 55%);
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .footer-inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    height: 650px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+  }
+
+  .footer-hero {
+    display: flex;
+    align-items: center;
+    gap: 56px;
+    padding: 0 40px;
+    width: 100%;
+  }
+
+  .footer-label {
+    flex-shrink: 0;
+    font-family: var(--font-uncut);
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.36px;
+    text-transform: uppercase;
+    color: var(--color-orange-500);
+  }
+
+  .footer-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20.759px;
+    text-transform: uppercase;
+    color: var(--color-orange-50);
+  }
+
+  .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .footer-word { flex-shrink: 0; }
+
+  .footer-word--sans {
+    font-family: var(--font-uncut);
+    font-weight: 700;
+    font-size: 57px;
+    line-height: 1.15;
+    letter-spacing: -2.28px;
+  }
+
+  .footer-word--serif {
+    font-family: var(--font-fragment);
+    font-weight: 400;
+    font-size: 52px;
+    line-height: 1.15;
+  }
+
+  .footer-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 24px;
+    border-radius: 999px;
+    background: var(--color-orange-950);
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    color: var(--color-orange-50);
+    text-decoration: none;
+    line-height: 1.15;
+    transition: background 0.15s;
+  }
+
+  .footer-cta:hover {
+    background: oklch(from var(--color-orange-950) calc(l + 0.08) c h);
+  }
+</style>

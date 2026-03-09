@@ -1,5 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import Layout from '../layouts/Layout.astro';
+import MainContent from '../components/MainContent.astro';
+import PageTitle from '../components/PageTitle.astro';
+import Tag from '../components/Tag.astro';
 import { getCollection } from 'astro:content';
 
 const allProjects = await getCollection('projects');
@@ -8,74 +11,147 @@ const sortedProjects = allProjects.sort(
 );
 ---
 
-<BaseLayout title="Playground - Jeff Herrera">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">
-        Playground
-      </h1>
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl">
-        Side projects, experiments, and explorations.
-      </p>
-    </div>
+<Layout title="Playground — Jeff Herrera">
+  <MainContent>
+    <div class="page-inner">
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <PageTitle title="Playground" />
+
       {sortedProjects.length === 0 ? (
-        <div class="col-span-2 text-center py-16">
-          <p class="text-zinc-500 dark:text-zinc-400 mb-4">
-            No projects yet. Add your experiments in <code class="px-2 py-1 bg-zinc-100 dark:bg-zinc-800 rounded">src/content/projects/</code>
-          </p>
-        </div>
+        <p class="empty-state">No projects yet. Add experiments in <code>src/content/projects/</code></p>
       ) : (
-        sortedProjects.map((project) => (
-          <article class="group border border-zinc-200 dark:border-zinc-800 rounded-lg p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
-            {project.data.cover && (
-              <img
-                src={project.data.cover}
-                alt={project.data.title}
-                class="rounded-lg mb-4 w-full aspect-video object-cover"
-              />
-            )}
-            <h2 class="text-xl font-semibold mb-2 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-              {project.data.title}
-            </h2>
-            <p class="text-zinc-600 dark:text-zinc-400 mb-4">
-              {project.data.description}
-            </p>
-            {project.data.tags.length > 0 && (
-              <div class="flex flex-wrap gap-2 mb-4">
-                {project.data.tags.map((tag) => (
-                  <span class="px-2 py-1 text-xs rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
-                    {tag}
-                  </span>
-                ))}
+        <div class="projects-grid">
+          {sortedProjects.map((project) => (
+            <article class="project-card">
+              {project.data.cover && (
+                <div class="project-cover">
+                  <img src={project.data.cover} alt={project.data.title} class="project-img" />
+                </div>
+              )}
+              <div class="project-info">
+                <h2 class="project-title">{project.data.title}</h2>
+                <p class="project-desc">{project.data.description}</p>
+                {project.data.tags.length > 0 && (
+                  <div class="project-tags">
+                    {project.data.tags.map((tag) => (
+                      <Tag label={tag} />
+                    ))}
+                  </div>
+                )}
+                <div class="project-links">
+                  {project.data.url && (
+                    <a href={project.data.url} target="_blank" rel="noopener noreferrer" class="project-link">
+                      View Project →
+                    </a>
+                  )}
+                  {project.data.github && (
+                    <a href={project.data.github} target="_blank" rel="noopener noreferrer" class="project-link">
+                      GitHub →
+                    </a>
+                  )}
+                </div>
               </div>
-            )}
-            <div class="flex gap-4">
-              {project.data.url && (
-                <a
-                  href={project.data.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                >
-                  View Project →
-                </a>
-              )}
-              {project.data.github && (
-                <a
-                  href={project.data.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-                >
-                  GitHub →
-                </a>
-              )}
-            </div>
-          </article>
-        ))
+            </article>
+          ))}
+        </div>
       )}
+
     </div>
-  </div>
-</BaseLayout>
+  </MainContent>
+</Layout>
+
+<style>
+  .empty-state {
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    color: var(--color-taupe-400);
+    margin: 0;
+  }
+
+  .empty-state code {
+    font-family: monospace;
+    font-size: 13px;
+    background: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .project-card {
+    background: white;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-cover {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-taupe-300);
+  }
+
+  .project-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+  }
+
+  .project-card:hover .project-img {
+    transform: scale(1.02);
+  }
+
+  .project-info {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .project-title {
+    font-family: var(--font-fragment);
+    font-size: 20px;
+    letter-spacing: -0.4px;
+    line-height: 1.2;
+    color: var(--color-orange-950);
+    margin: 0;
+  }
+
+  .project-desc {
+    font-family: var(--font-uncut);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-taupe-400);
+    margin: 0;
+  }
+
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .project-links {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .project-link {
+    font-family: var(--font-uncut);
+    font-size: 13px;
+    color: var(--color-orange-500);
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+
+  .project-link:hover { opacity: 0.7; }
+</style>

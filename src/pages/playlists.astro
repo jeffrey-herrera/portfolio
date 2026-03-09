@@ -1,30 +1,70 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import Layout from '../layouts/Layout.astro';
+import MainContent from '../components/MainContent.astro';
+import PageTitle from '../components/PageTitle.astro';
 ---
 
-<BaseLayout title="Playlists - Jeff Herrera">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <div class="mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4">
-        Playlists
-      </h1>
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl">
-        Curated collections of music, inspiration, and more.
-      </p>
-    </div>
+<Layout title="Playlists — Jeff Herrera">
+  <MainContent>
+    <div class="page-inner">
 
-    <div class="space-y-8">
-      <!-- Example playlist card -->
-      <article class="border border-zinc-200 dark:border-zinc-800 rounded-lg p-6">
-        <h2 class="text-2xl font-semibold mb-2">
-          Example Playlist
-        </h2>
-        <p class="text-zinc-600 dark:text-zinc-400 mb-4">
-          Add your playlists here. You could embed Spotify playlists, YouTube videos, or create custom collections.
-        </p>
-      </article>
+      <PageTitle title="Playlists" />
 
-      <!-- Add more playlists here or integrate with an API -->
+      <p class="page-intro">Curated music for creative work.</p>
+
+      <div class="playlists">
+        <!-- Add playlist embeds or cards here -->
+        <article class="playlist-card">
+          <h2 class="playlist-name">Example Playlist</h2>
+          <p class="playlist-desc">
+            Add your playlists here — embed Spotify, YouTube, or create custom collections.
+          </p>
+        </article>
+      </div>
+
     </div>
-  </div>
-</BaseLayout>
+  </MainContent>
+</Layout>
+
+<style>
+  .page-inner {
+    max-width: 700px;
+  }
+
+  .page-intro {
+    font-family: var(--font-fragment);
+    font-size: 20px;
+    line-height: 1.35;
+    letter-spacing: -0.4px;
+    color: var(--color-taupe-400);
+    margin: 0 0 48px;
+  }
+
+  .playlists {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .playlist-card {
+    background: white;
+    border-radius: 6px;
+    padding: 24px;
+  }
+
+  .playlist-name {
+    font-family: var(--font-fragment);
+    font-size: 20px;
+    letter-spacing: -0.4px;
+    color: var(--color-orange-950);
+    margin: 0 0 8px;
+  }
+
+  .playlist-desc {
+    font-family: var(--font-uncut);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-taupe-400);
+    margin: 0;
+  }
+</style>

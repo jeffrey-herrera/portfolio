@@ -1,35 +1,106 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import Layout from '../layouts/Layout.astro';
+import MainContent from '../components/MainContent.astro';
+import PageTitle from '../components/PageTitle.astro';
 ---
 
-<BaseLayout title="About - Jeff Herrera">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <h1 class="text-4xl md:text-5xl font-bold mb-8">
-      About
-    </h1>
+<Layout title="About — Jeff Herrera">
+  <MainContent>
 
-    <div class="prose prose-zinc dark:prose-invert max-w-none">
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 mb-8">
-        Product designer and developer with a passion for creating thoughtful digital experiences.
-      </p>
+    <PageTitle title="About" />
 
-      <h2>Background</h2>
-      <p>
-        Write about your background, experience, and what drives you as a designer and developer.
-      </p>
-
-      <h2>Skills</h2>
-      <ul>
-        <li>Product Design</li>
-        <li>User Experience (UX)</li>
-        <li>Front-end Development</li>
-        <li>Prototyping</li>
-      </ul>
-
-      <h2>Get in Touch</h2>
-      <p>
-        Feel free to reach out if you'd like to collaborate or just chat about design and development.
-      </p>
+    <div class="page-inner row">
+      <div class="page-body">
+        <p>
+          I'm Jeff, a creative director based in NYC, and I share my creative space with my overlord cat Taco, who has strong opinions and zero interest in mine. My focus is on building the conditions that make good creative repeatable: strong brand systems, clear process, and a way of working that gives teams room to do their best work. I've found that good structure creates more space for craft, not less. AI fits into that thinking the same way, helping everyone get to clarity faster and see ideas well enough to act.
+        </p>
+        <p>
+          With a decade of experience across in-house and freelance roles, I specialize in brand consistency at scale, creative direction for product storytelling, and experiential design. A lot of that work has lived in tech and SaaS, where making complex products feel understandable is half the job...and the other half is keeping up with how fast everything changes.
+        </p>
+        <br />
+        <p>
+          Some concepts I've been thinking about lately are:
+          <ul>
+            <li>How brands can evolve and scale while staying true to the intent that made them meaningful in the first place</li>
+            <li>How process and structure can remove friction, improve collaboration, and give creative work more space to be thoughtful and intentional</li>
+            <li>How AI can serve as a bridge between creative vision and real-world context, helping both creatives and non-creatives see ideas clearly, evaluate them confidently, and move them forward</li>
+          </ul>
+        </p>
+      </div>
+      <div class="page-side">
+        <p class="page-side-title">Capabilities</p>
+        <ul>
+          <li>Identity</li>
+          <li>Design Systems</li>
+          <li>Brand Refreshes</li>
+          <li>Brand Strategy</li>
+          <li>Experiential</li>
+          <li>Guidelines</li>
+          <li>Packaging</li>
+          <li>Campaigns</li>
+          <li>Wayfinding</li>
+          <li>Design Process</li>
+          <li>Self-Service Programs</li>
+        </ul>
+      </div>
     </div>
-  </div>
-</BaseLayout>
+  </MainContent>
+</Layout>
+
+<style>
+  .page-body {
+    font-family: var(--font-uncut);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--color-taupe-500);
+    grid-column: 1 / 6;
+  }
+
+  .page-side {
+    grid-column: 8 / -1;
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    color: var(--color-taupe-400);
+  }
+
+  .page-side-title {
+    margin-bottom: 30px;
+  }
+
+  .page-side ul li {
+    margin-bottom: 10px;
+  }
+
+  .page-body h2 {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--color-taupe-400);
+    margin: 32px 0 8px;
+  }
+
+  .page-body p {
+    margin: 0 0 16px;
+    text-wrap: balance;
+  }
+
+  .page-body ul {
+    list-style: disc;
+    padding-left: 1rem;
+  }
+
+  .page-body ul li {
+    margin-bottom: 1rem;
+    text-wrap: balance;
+  }
+
+  .page-body a {
+    color: var(--color-orange-500);
+    text-decoration: none;
+  }
+
+  .page-body a:hover {
+    text-decoration: underline;
+  }
+</style>

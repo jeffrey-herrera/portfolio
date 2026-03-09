@@ -1,0 +1,20 @@
+---
+---
+
+<main class="main-content">
+  <slot />
+</main>
+
+<style>
+  /*
+   * Right-column content wrapper for all pages.
+   * flex-1 fills the remaining width after the 385px sidebar.
+   * position: relative for child absolute elements (e.g. divider on home).
+   */
+  .main-content {
+    grid-column: 4 / -1;
+    margin-right: 40px;
+    padding-bottom: 80px;
+    position: relative;
+  }
+</style>

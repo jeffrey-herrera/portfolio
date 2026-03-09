@@ -1,0 +1,196 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = '/' } = Astro.props;
+
+const navItems = [
+  { href: '/', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/playground', label: 'Playground' },
+  { href: '/playlists', label: 'Playlists' },
+];
+
+const isHome = currentPath === '/';
+---
+
+<aside class="sidebar">
+
+  <!-- Logo -->
+  <div class="sidebar-item">
+    <a href="/" class="favicon-link">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="6" fill="var(--color-orange-950)"/>
+        <text x="16" y="22" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="13" fill="var(--color-orange-500)">JH</text>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-item">
+    <ul class="nav-list">
+      {navItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={`nav-link ${currentPath === item.href ? 'nav-link--active' : ''}`}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <!-- Social links -->
+  <div class="sidebar-item">
+    <div class="sidebar-section">
+      <span class="sidebar-label">Let's Talk</span>
+      <div class="sidebar-links">
+        <a href="https://instagram.com/jeffherrera" target="_blank" rel="noopener" class="sidebar-link">Instagram</a>
+        <a href="https://linkedin.com/in/jeffherrera" target="_blank" rel="noopener" class="sidebar-link">LinkedIn</a>
+        <a href="mailto:hello@jeffherrera.com" class="sidebar-link">Email</a>
+      </div>
+    </div>
+  </div>
+
+  {isHome && (
+    <!-- Selected Work sub-nav: starts hidden, fades in when user scrolls into the work section -->
+    <div class="sidebar-item sidebar-work-nav">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Selected Work</span>
+        <div class="sidebar-links">
+          <a href="/#brand" class="sidebar-link">Brand</a>
+          <a href="/#physical" class="sidebar-link">Physical</a>
+          <a href="/#digital" class="sidebar-link">Digital</a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  <!-- Theme toggle pushed to bottom of sidebar -->
+  <div class="sidebar-toggle">
+    <ThemeToggle />
+  </div>
+
+</aside>
+
+<style>
+  .sidebar {
+    grid-column: 1/3;
+    position: sticky;
+    top: 0;
+    padding-top: 40px;
+    padding-left: 40px;
+    padding-bottom: 40px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-item {
+    margin-bottom: 40px;
+  }
+
+  .favicon-link {
+    display: block;
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    line-height: 1.35;
+  }
+
+  /* The dot lives entirely on the link via ::before — no separate element needed */
+  .nav-link {
+    display: block;
+    position: relative;
+    font-family: var(--font-uncut);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.16px;
+    color: var(--color-orange-950);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-link--active { color: var(--color-orange-500); }
+  .nav-link:hover { color: var(--color-orange-500); }
+
+  /* Orange indicator dot — attached to the active link, 10px to the left of the text */
+  .nav-link--active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--color-orange-500);
+  }
+
+  .sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 40px;
+  }
+
+  .sidebar-label {
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    color: var(--color-taupe-400);
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .sidebar-links {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+    color: var(--color-orange-950);
+    line-height: 1.5;
+  }
+
+  .sidebar-link {
+    color: var(--color-orange-950);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .sidebar-link:hover { color: var(--color-orange-500); }
+
+  /* Selected Work sub-nav: hidden by default, JS adds .visible on scroll */
+  .sidebar-work-nav {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .sidebar-work-nav.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Theme toggle pinned to bottom */
+  .sidebar-toggle {
+    margin-top: auto;
+  }
+</style>

@@ -2,19 +2,44 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f4f4f5;
-  --color-zinc-200: #e4e4e7;
-  --color-zinc-300: #d4d4d8;
-  --color-zinc-400: #a1a1aa;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #52525b;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-800: #27272a;
-  --color-zinc-900: #18181b;
-  --color-zinc-950: #09090b;
+  /* Neutral scale — kept for ThemeToggle and future dark-mode work */
+  --color-zinc-50:  oklch(98.2% 0.002 247.9);
+  --color-zinc-100: oklch(96.1% 0.004 253.1);
+  --color-zinc-200: oklch(92.6% 0.009 258.0);
+  --color-zinc-300: oklch(87.1% 0.013 261.0);
+  --color-zinc-400: oklch(70.7% 0.016 261.3);
+  --color-zinc-500: oklch(55.2% 0.018 264.0);
+  --color-zinc-600: oklch(44.3% 0.016 261.0);
+  --color-zinc-700: oklch(37.2% 0.013 261.0);
+  --color-zinc-800: oklch(27.5% 0.009 264.0);
+  --color-zinc-900: oklch(20.8% 0.006 265.0);
+  --color-zinc-950: oklch(14.5% 0.004 265.0);
+
+  /* ── Brand colors ─────────────────────────────────────────────────────── */
+
+  /* Background */
+  --color-cream:      oklch(93% 0.013 70);   /* #eee5dd */
+
+  /* Orange scale */
+  --color-orange-50:  oklch(98% 0.016 75);   /* #fff7ed */
+  --color-orange-500: oklch(68% 0.214 43);   /* #ff6900  primary accent */
+  --color-orange-900: oklch(38% 0.090 35);   /* #8b2f0c  footer gradient */
+  --color-orange-950: oklch(27% 0.078 36);   /* #441306  dark text/ui */
+
+  /* Taupe scale */
+  --color-taupe-300:  oklch(86% 0.011 48);   /* #d9d2d0 */
+  --color-taupe-400:  oklch(71% 0.016 45);   /* #ada09c  muted text */
+  --color-taupe-500:  oklch(54% 0.024 44);   /* #7e6d66 */
+
+  /* ── Fonts ────────────────────────────────────────────────────────────── */
+  /* Commercial files go in /public/fonts/ with @font-face declarations.    */
+  /* System fallbacks used until real files are added.                       */
+  --font-uncut:    'Uncut Sans', system-ui, sans-serif;
+  --font-fragment: 'PP Fragment', Georgia, serif;
 }
 
-* {
-  @apply border-zinc-200 dark:border-zinc-800;
+.row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 20px;
 }
