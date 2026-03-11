@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import { ViewTransitions } from 'astro:transitions';
 import Analytics from '../components/Analytics.astro';
+import Cursor from '../components/Cursor.astro';
+import Footer from '../components/Footer.astro';
 import Sidebar from '../components/Sidebar.astro';
 
 interface Props {
@@ -28,17 +30,17 @@ const currentPath = Astro.url.pathname;
     <title>{title}</title>
     <ViewTransitions />
 
-    <!-- Dark mode: runs before paint to prevent flash -->
-    <script is:inline>
-      const saved = typeof localStorage !== 'undefined' && localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.classList[saved === 'dark' || (!saved && prefersDark) ? 'add' : 'remove']('dark');
-      if (typeof localStorage !== 'undefined') {
-        new MutationObserver(() => {
-          localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
-        }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-      }
-    </script>
+    <!-- Open Graph / Social sharing -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${Astro.url.origin}/images/SEO%20Image.png`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${Astro.url.origin}/images/SEO%20Image.png`} />
+
   </head>
 
   <body class="overflow-x-hidden">
@@ -49,41 +51,47 @@ const currentPath = Astro.url.pathname;
       </div>
     </div>
 
-    <footer class="site-footer">
-      <div class="footer-inner">
+    <Footer />
 
-        <div class="footer-hero">
-          <span class="footer-label">JEFF HERRERA</span>
-
-          <div class="footer-text">
-            <div class="footer-row">
-              <span class="footer-word footer-word--serif">You</span>
-              <span class="footer-word footer-word--serif">reached</span>
-              <span class="footer-word footer-word--sans">THE</span>
-              <span class="footer-word footer-word--sans">END,</span>
-            </div>
-            <div class="footer-row">
-              <span class="footer-word footer-word--sans">LET'S</span>
-              <span class="footer-word footer-word--sans">make</span>
-              <span class="footer-word footer-word--sans">it</span>
-              <span class="footer-word footer-word--serif">a</span>
-              <span class="footer-word footer-word--serif">beginning.</span>
-            </div>
-          </div>
-
-          <span class="footer-label">DESIGN DIRECTOR</span>
-        </div>
-
-        <a href="mailto:hello@jeffherrera.com" class="footer-cta">
-          →&nbsp; Let's Talk
-        </a>
-
-      </div>
-    </footer>
-
+    <Cursor />
     <Analytics />
   </body>
 </html>
+
+<script>
+  import Lenis from 'lenis';
+
+  let lenis: Lenis | null = null;
+  let lenisRaf: number | null = null;
+
+  function initLenis() {
+    lenis = new Lenis({
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    });
+
+    function raf(time: number) {
+      lenis!.raf(time);
+      lenisRaf = requestAnimationFrame(raf);
+    }
+    lenisRaf = requestAnimationFrame(raf);
+
+    document.addEventListener('astro:before-swap', () => {
+      if (lenisRaf !== null) cancelAnimationFrame(lenisRaf);
+      lenis?.destroy();
+      lenis = null;
+      lenisRaf = null;
+    }, { once: true });
+  }
+
+  initLenis();
+  document.addEventListener('astro:after-swap', initLenis);
+
+  // Allow other components to trigger a smooth scroll via Lenis
+  document.addEventListener('scroll-to-top', () => {
+    lenis?.scrollTo(0);
+  });
+</script>
 
 <style>
   .page-root {
@@ -98,91 +106,12 @@ const currentPath = Astro.url.pathname;
     position: relative;
   }
 
-  /* ── Footer ─────────────────────────────────────────────────────────── */
-  .site-footer {
-    background: radial-gradient(ellipse 80% 70% at 50% 110%, var(--color-orange-900) 0%, var(--color-orange-950) 55%);
-    width: 100%;
-    overflow: hidden;
+  @media (max-width: 1023px) {
+    .page-layout {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-top: 80px; /* 40px top padding + 40px button height */
+    }
   }
 
-  .footer-inner {
-    max-width: 1440px;
-    margin: 0 auto;
-    height: 650px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 64px;
-  }
-
-  .footer-hero {
-    display: flex;
-    align-items: center;
-    gap: 56px;
-    padding: 0 40px;
-    width: 100%;
-  }
-
-  .footer-label {
-    flex-shrink: 0;
-    font-family: var(--font-uncut);
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.36px;
-    text-transform: uppercase;
-    color: var(--color-orange-500);
-  }
-
-  .footer-text {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20.759px;
-    text-transform: uppercase;
-    color: var(--color-orange-50);
-  }
-
-  .footer-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-
-  .footer-word { flex-shrink: 0; }
-
-  .footer-word--sans {
-    font-family: var(--font-uncut);
-    font-weight: 700;
-    font-size: 57px;
-    line-height: 1.15;
-    letter-spacing: -2.28px;
-  }
-
-  .footer-word--serif {
-    font-family: var(--font-fragment);
-    font-weight: 400;
-    font-size: 52px;
-    line-height: 1.15;
-  }
-
-  .footer-cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 24px;
-    border-radius: 999px;
-    background: var(--color-orange-950);
-    font-family: var(--font-uncut);
-    font-size: 15px;
-    color: var(--color-orange-50);
-    text-decoration: none;
-    line-height: 1.15;
-    transition: background 0.15s;
-  }
-
-  .footer-cta:hover {
-    background: oklch(from var(--color-orange-950) calc(l + 0.08) c h);
-  }
 </style>

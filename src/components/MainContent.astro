@@ -17,4 +17,14 @@
     padding-bottom: 80px;
     position: relative;
   }
+
+  @media (max-width: 1023px) {
+    .main-content {
+      grid-column: 1 / -1;
+      margin-right: 0;
+      padding-left: 20px;
+      padding-right: 20px;
+      min-width: 0; /* prevent grid item from expanding beyond its 1fr track */
+    }
+  }
 </style>

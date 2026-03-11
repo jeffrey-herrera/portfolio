@@ -19,6 +19,7 @@
 
   /* Background */
   --color-cream:      oklch(93% 0.013 70);   /* #eee5dd */
+  --color-white:      oklch(100% 0 0);       /* #ffffff  card surfaces */
 
   /* Orange scale */
   --color-orange-50:  oklch(98% 0.016 75);   /* #fff7ed */
@@ -42,4 +43,37 @@
   display: grid;
   grid-template-columns: repeat(9, 1fr);
   gap: 20px;
+}
+
+@media (max-width: 1023px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ── Scroll-reveal utility ─────────────────────────────────────────────────
+   Wrap text in .reveal-outer (overflow:hidden) + .reveal-inner.
+   JS adds .is-revealed to .reveal-inner when the element enters the viewport. */
+.reveal-inner {
+  display: block;
+  transform: translateY(110%);
+  will-change: transform;
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-inner.is-revealed {
+  transform: translateY(0);
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   Disable or flatten animations for users who prefer reduced motion.
+   Component-scoped animations (hero, cursor, footer) are handled
+   in their own <style> blocks; this covers the global utility.          */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-inner {
+    transform: none;
+    transition: none;
+  }
 }

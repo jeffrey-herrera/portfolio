@@ -1,0 +1,155 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  current: CollectionEntry<'work'>;
+  allWork: CollectionEntry<'work'>[];
+  /** Number of related projects to show (default: 3) */
+  count?: number;
+}
+
+const { current, allWork, count = 3 } = Astro.props;
+
+// Score each project by number of shared tags, then sort descending.
+// Tie-break by publishedAt (newest first).
+const currentTags = new Set(current.data.tags.map(t => t.toLowerCase()));
+
+const scored = allWork
+  .filter(w => w.slug !== current.slug)
+  .map(w => {
+    const shared = w.data.tags.filter(t => currentTags.has(t.toLowerCase())).length;
+    return { entry: w, shared };
+  })
+  .sort((a, b) =>
+    b.shared - a.shared ||
+    b.entry.data.publishedAt.valueOf() - a.entry.data.publishedAt.valueOf()
+  )
+  .slice(0, count);
+
+const related = scored.map(s => s.entry);
+---
+
+{related.length > 0 && (
+  <section class="related-projects">
+    <h2 class="related-heading">Related Projects</h2>
+    <div class="related-grid">
+      {related.map((project) => (
+        <a href={`/work/${project.slug}`} class="related-card" data-cursor-label="View Project">
+          <div class="related-image">
+            {project.data.cover
+              ? <Image src={project.data.cover} alt={project.data.title} class="related-img" width={400} height={300} />
+              : <div class="related-placeholder"></div>
+            }
+          </div>
+          <div class="related-info">
+            <span class="related-title">{project.data.title}</span>
+            <span class="related-cat">{project.data.tags[0]}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .related-projects {
+    margin-top: 80px;
+    padding-top: 48px;
+    border-top: 1px solid var(--color-taupe-300);
+  }
+
+  .related-heading {
+    font-family: var(--font-fragment);
+    font-size: 24px;
+    letter-spacing: -0.24px;
+    line-height: 1;
+    color: var(--color-orange-950);
+    margin: 0 0 32px;
+  }
+
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-decoration: none;
+  }
+
+  .related-image {
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--color-taupe-300);
+    position: relative;
+  }
+
+  .related-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: scale 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .related-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--color-taupe-300);
+  }
+
+  /* Orange overlay on hover */
+  .related-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-orange-500);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+  }
+
+  .related-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.15;
+    font-family: var(--font-uncut);
+  }
+
+  .related-title {
+    font-size: 16px;
+    color: var(--color-orange-950);
+    transition: color 0.2s ease;
+  }
+
+  .related-cat {
+    font-size: 12px;
+    color: var(--color-taupe-400);
+  }
+
+  @media (hover: hover) {
+    .related-card:hover .related-img { scale: 1.06; }
+    .related-card:hover .related-image::after { opacity: 0.2; }
+    .related-card:hover .related-title { color: var(--color-orange-500); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .related-img {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .related-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>
