@@ -2,58 +2,70 @@
 import Layout from '../layouts/Layout.astro';
 import MainContent from '../components/MainContent.astro';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 
 const allWork = await getCollection('work');
 
-const brandWork = allWork.filter(w => w.data.tags.some(t => t.toLowerCase() === 'brand'));
+const brandWork    = allWork.filter(w => w.data.tags.some(t => t.toLowerCase() === 'brand'));
 const physicalWork = allWork.filter(w => w.data.tags.some(t => t.toLowerCase() === 'physical'));
-const digitalWork = allWork.filter(w => w.data.tags.some(t => t.toLowerCase() === 'digital'));
+const digitalWork  = allWork.filter(w => w.data.tags.some(t => t.toLowerCase() === 'digital'));
 
 const categories = [
-  { name: 'Brand', items: brandWork },
+  { name: 'Brand',    items: brandWork    },
   { name: 'Physical', items: physicalWork },
-  { name: 'Digital', items: digitalWork },
+  { name: 'Digital',  items: digitalWork  },
 ];
 ---
 
 <Layout>
   <MainContent>
-
-    <!-- Hero text -->
+    <div class="hero row">
+    <!-- Hero text — each word wrapped in .word-clip for clip-mask entrance  -->
     <div class="hero-text">
-      <span class="word word--sans word--orange">I'M</span>
-      <span class="word word--sans word--orange">JEFF,</span>
-      <span class="word word--sans word--orange">a</span>
-
-      <!-- Orange glow pill -->
-      <span class="hero-pill hero-pill--orange">
-        <span class="hero-pill__glow"></span>
+      <span class="word-clip" style="--i:0"><span class="word word--sans word--orange">I'M</span></span>
+      <span class="word-clip" style="--i:1"><span class="word word--sans word--orange">JEFF,</span></span>
+      
+      <!-- Portrait pill — opacity+scale entrance (clip not used: shadow needs overflow:visible) -->
+      <span class="hero-pill hero-entrance" style="--i:3">
+        <span class="hero-pill__shadow">
+          <span class="pill-orange-bg"></span>
+          <Image src="/portrait.jpg" alt="" aria-hidden="true" class="pill-portrait-img" width={300} height={375} loading="eager" />
+        </span>
+        <span class="hero-pill__main">
+          <span class="pill-orange-bg"></span>
+          <Image src="/portrait.jpg" alt="Jeff Herrera" class="pill-portrait-img" width={300} height={375} loading="eager" />
+        </span>
       </span>
+      
+      <span class="word-clip" style="--i:2"><span class="word word--sans word--orange">a</span></span>
+      <span class="word-clip" style="--i:4"><span class="word word--sans word--orange">creative</span></span>
+      <span class="word-clip" style="--i:5"><span class="word word--sans word--orange">director</span></span>
+      <span class="word-clip" style="--i:6"><span class="word word--sans word--orange">based</span></span>
+      <span class="word-clip" style="--i:7"><span class="word word--sans word--orange">in</span></span>
+      <span class="word-clip" style="--i:8"><span class="word word--sans word--orange">NYC,</span></span>
 
-      <span class="word word--sans word--orange">creative</span>
-      <span class="word word--sans word--orange">director</span>
-      <span class="word word--sans word--orange">based</span>
-      <span class="word word--sans word--orange">in</span>
-      <span class="word word--sans word--orange">NYC,</span>
-
-      <!-- Photo pill -->
-      <span class="hero-pill hero-pill--photo">
-        <img
-          src="/headshot.jpg"
-          alt=""
-          class="hero-pill__img"
-          onerror="this.style.display='none'"
-        />
-      </span>
+      <!-- NYC pill
+      <span class="hero-pill hero-entrance" style="--i:9">
+        <span class="hero-pill__shadow">
+          <img src="/nyc.jpg" alt="" aria-hidden="true" class="pill-nyc-img" />
+        </span>
+        <span class="hero-pill__main">
+          <img src="/nyc.jpg" alt="NYC" class="pill-nyc-img" />
+        </span>
+      </span> -->
+      <br>
 
       <!-- Serif words -->
-      <span class="word word--serif word--dark">building</span>
-      <span class="word word--serif word--dark">lasting</span>
-      <span class="word word--serif word--dark">brands</span>
-      <span class="word word--serif word--dark">across</span>
-      <span class="word word--serif word--dark">physical</span>
-      <span class="word word--serif word--dark">&amp;</span>
-      <span class="word word--serif word--dark">digital.</span>
+      <span class="word-clip" style="--i:10"><span class="word word--serif word--dark">building</span></span>
+      <span class="word-clip" style="--i:11"><span class="word word--serif word--dark">lasting</span></span>
+      <span class="word-clip" style="--i:12"><span class="word word--serif word--dark">brands</span></span>
+      <span class="word-clip" style="--i:13"><span class="word word--serif word--dark">across</span></span>
+      <span class="word-clip" style="--i:14"><span class="word word--serif word--dark">physical</span></span>
+      <span class="word-clip" style="--i:15"><span class="word word--serif word--dark">&amp;</span></span>
+      <span class="word-clip" style="--i:16"><span class="word word--serif word--dark">digital.</span></span>
+    </div>
+
+      
     </div>
 
     <!-- About blurb -->
@@ -71,14 +83,16 @@ const categories = [
     <!-- Work sections -->
     <div class="work-sections">
 
-      <h2 class="work-heading">Selected Work ↓</h2>
+      <!-- <h2 class="work-heading">
+        <span class="reveal-outer"><span class="reveal-inner">Selected Work &darr;</span></span>
+      </h2> -->
 
       {categories.map((category) => (
         <div id={category.name.toLowerCase()} class="category-card">
 
           <div class="category-header">
-            <span class="category-name">{category.name}</span>
-            <span class="category-count">{category.items.length}</span>
+            <span class="category-name"><span class="reveal-inner">{category.name}</span></span>
+            <span class="category-count" data-count={category.items.length}>{category.items.length}</span>
           </div>
 
           {category.items.length === 0 ? (
@@ -86,11 +100,11 @@ const categories = [
           ) : (
             <div class="projects-list">
               {category.items[0] && (
-                <a href={`/work/${category.items[0].slug}`} class="project-link">
+                <a href={`/work/${category.items[0].slug}`} class="project-link" data-cursor-label="View Project">
                   <div class="project-card project-card--large">
                     <div class="project-image project-image--wide">
                       {category.items[0].data.cover
-                        ? <img src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" />
+                        ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" />
                         : <div class="project-placeholder"></div>
                       }
                     </div>
@@ -112,11 +126,11 @@ const categories = [
                   return pairs.map((pair) => (
                     <div class="project-row">
                       {pair.map((item) => (
-                        <a href={`/work/${item.slug}`} class="project-link project-link--half">
+                        <a href={`/work/${item.slug}`} class="project-link project-link--half" data-cursor-label="View Project">
                           <div class="project-card">
                             <div class="project-image project-image--square">
                               {item.data.cover
-                                ? <img src={item.data.cover} alt={item.data.title} class="project-img" />
+                                ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} />
                                 : <div class="project-placeholder"></div>
                               }
                             </div>
@@ -142,36 +156,241 @@ const categories = [
 </Layout>
 
 <script>
+  // ── Work nav + back-to-top scroll reveal ─────────────────────────────────
   function initWorkNavScroll() {
     const workSections = document.querySelector('.work-sections') as HTMLElement | null;
-    const workNav = document.querySelector('.sidebar-work-nav') as HTMLElement | null;
+    const workNav      = document.querySelector('.sidebar-work-nav')  as HTMLElement | null;
+    const backTop      = document.getElementById('sidebar-back-top') as HTMLElement | null;
 
     if (!workSections || !workNav) return;
 
-    // Cache the work section's absolute position from the document top
-    const workAbsTop = workSections.getBoundingClientRect().top + window.scrollY;
+    const workAbsTop   = workSections.getBoundingClientRect().top + window.scrollY;
     const triggerPoint = workAbsTop + 200;
 
+    let backTopShown = false;
+
     const onScroll = () => {
-      if (window.scrollY >= triggerPoint) {
-        workNav.classList.add('visible');
-      } else {
-        workNav.classList.remove('visible');
+      workNav.classList.toggle('visible', window.scrollY >= triggerPoint);
+
+      if (backTop) {
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        const pct = scrollable > 0 ? window.scrollY / scrollable : 0;
+        // Latch: show once threshold is crossed, only hide when scrolling back up
+        if (!backTopShown && pct >= 0.4) {
+          backTopShown = true;
+        } else if (backTopShown && pct < 0.4) {
+          backTopShown = false;
+        }
+        backTop.classList.toggle('visible', backTopShown);
       }
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // run once immediately to set correct initial state
+    onScroll();
 
-    // Clean up listener before View Transition swaps the page
     document.addEventListener('astro:before-swap', () => {
       window.removeEventListener('scroll', onScroll);
     }, { once: true });
   }
 
-  // Run on first load and after every View Transition
-  initWorkNavScroll();
-  document.addEventListener('astro:after-swap', initWorkNavScroll);
+  // ── Scroll-triggered reveals (.reveal-inner → .is-revealed) ─────────────
+  // IMPORTANT: We observe the PARENT of .reveal-inner, not .reveal-inner itself.
+  // IO uses getBoundingClientRect() which follows CSS transforms — so .reveal-inner
+  // at translateY(110%) appears off-screen to the observer even when the heading
+  // is visually in the viewport. The parent (.reveal-outer / .category-name) sits
+  // in normal layout flow, so its bounding box is always correct.
+  function initScrollReveals() {
+    const inners = document.querySelectorAll<HTMLElement>('.reveal-inner');
+    if (!inners.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const inner = (entry.target as HTMLElement).querySelector<HTMLElement>('.reveal-inner');
+        if (inner) inner.classList.add('is-revealed');
+        io.unobserve(entry.target);
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -5% 0px' });
+
+    // Observe each .reveal-inner's parent (which is in normal layout flow)
+    inners.forEach(inner => {
+      if (inner.parentElement) io.observe(inner.parentElement);
+    });
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  // ── Image parallax ───────────────────────────────────────────────────────
+  // CSS owns `scale` (including hover); JS owns `translate` only — no conflict.
+  function initParallax() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const imgs = Array.from(document.querySelectorAll<HTMLElement>('.project-img'));
+    if (!imgs.length) return;
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const vh = window.innerHeight;
+        imgs.forEach(img => {
+          const container = img.closest('.project-image') as HTMLElement | null;
+          if (!container) return;
+          const rect     = container.getBoundingClientRect();
+          const progress = (vh - rect.top) / (vh + rect.height);
+          const clamped  = Math.max(0, Math.min(1, progress));
+          const shift    = (clamped - 0.5) * -30; // ±15px
+          img.style.translate = `0 ${shift}px`;
+        });
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', onScroll);
+    }, { once: true });
+  }
+
+  // ── Active section tracking → sidebar .is-active ─────────────────────────
+  function initActiveSections() {
+    const sidebarLinks = document.querySelectorAll<HTMLElement>('.sidebar-work-nav .sidebar-link');
+    if (!sidebarLinks.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = (entry.target as HTMLElement).id;
+        sidebarLinks.forEach(link => {
+          link.classList.toggle('is-active', link.getAttribute('href') === `/#${id}`);
+        });
+      });
+    }, { rootMargin: '-25% 0px -65% 0px' });
+
+    ['brand', 'physical', 'digital'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  // ── Magnetic about button ─────────────────────────────────────────────────
+  function initMagnetic() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const btn = document.querySelector<HTMLElement>('.about-btn');
+    if (!btn) return;
+
+    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
+
+    const onMove = (e: MouseEvent) => {
+      const rect   = btn.getBoundingClientRect();
+      const cx     = rect.left + rect.width  / 2;
+      const cy     = rect.top  + rect.height / 2;
+      const dx     = e.clientX - cx;
+      const dy     = e.clientY - cy;
+      const dist   = Math.sqrt(dx * dx + dy * dy);
+      const radius = Math.max(rect.width, rect.height) * 1.6;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (dist < radius) {
+          const strength = 0.38;
+          const tx = dx * strength * (1 - dist / radius);
+          const ty = dy * strength * (1 - dist / radius);
+          btn.style.transform = `translate(${tx}px, ${ty}px)`;
+        } else {
+          btn.style.transform = '';
+        }
+      });
+    };
+
+    const onLeave = () => {
+      if (rafId) cancelAnimationFrame(rafId);
+      btn.style.transform = '';
+    };
+
+    document.addEventListener('mousemove', onMove);
+    btn.addEventListener('mouseleave', onLeave);
+
+    document.addEventListener('astro:before-swap', () => {
+      document.removeEventListener('mousemove', onMove);
+      btn.removeEventListener('mouseleave', onLeave);
+      if (rafId) cancelAnimationFrame(rafId);
+    }, { once: true });
+  }
+
+  // ── Category count roll-up ────────────────────────────────────────────────
+  function initCounts() {
+    const counts = document.querySelectorAll<HTMLElement>('.category-count[data-count]');
+    if (!counts.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el     = entry.target as HTMLElement;
+        const target = parseInt(el.dataset.count ?? '0', 10);
+        if (target === 0) return;
+        io.unobserve(el);
+
+        const duration = 600;
+        const start    = performance.now();
+        const tick     = (now: number) => {
+          const t     = Math.min(1, (now - start) / duration);
+          const eased = 1 - (1 - t) * (1 - t); // ease-out quad
+          el.textContent = String(Math.round(eased * target));
+          if (t < 1) requestAnimationFrame(tick);
+          else el.textContent = String(target); // snap to final value
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.5 });
+
+    counts.forEach(el => io.observe(el));
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  // ── Project card entrance — Option B: staggered fade + slide-up ──────────
+  // Large card enters first; within each pair, the right card is delayed 90ms.
+  function initProjectCards() {
+    const cards = document.querySelectorAll<HTMLElement>('a.project-link');
+    if (!cards.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target as HTMLElement;
+
+        // Stagger right card in a pair
+        const row = el.closest('.project-row');
+        if (row) {
+          const siblings = Array.from(row.querySelectorAll<HTMLElement>('a.project-link'));
+          const idx = siblings.indexOf(el);
+          if (idx > 0) el.style.setProperty('--enter-delay', `${idx * 90}ms`);
+        }
+
+        el.classList.add('is-visible');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.08 });
+
+    cards.forEach(card => io.observe(card));
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  // ── Init all ─────────────────────────────────────────────────────────────
+  function initAll() {
+    initWorkNavScroll();
+    initScrollReveals();
+    initProjectCards();
+    initParallax();
+    initActiveSections();
+    initMagnetic();
+    initCounts();
+  }
+
+  initAll();
+  document.addEventListener('astro:after-swap', initAll);
 </script>
 
 <style>
@@ -181,6 +400,7 @@ const categories = [
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    grid-column: 1 / 8;
     align-content: flex-start;
     padding-top: 112px;
     gap: 0 16px;
@@ -190,8 +410,10 @@ const categories = [
   .word {
     white-space: nowrap;
     line-height: 1.15;
-    letter-spacing: -1.12px;
-    font-size: 72px;
+    /* Fluid from 24px on small phones up to 80px at desktop.
+       letter-spacing in em so it scales proportionally. */
+    font-size: clamp(2.4rem, 5.5vw, 5rem);
+    letter-spacing: -0.014em;
   }
 
   .word--sans {
@@ -210,37 +432,100 @@ const categories = [
   .word--orange { color: var(--color-orange-500); }
   .word--dark   { color: var(--color-orange-950); }
 
+  /* ── Word clip: hides word until it slides up ─────────────────────────── */
+  .word-clip {
+    overflow: hidden;
+    display: inline-flex;
+    vertical-align: middle;
+    line-height: 1.15; /* match .word so clip height is correct */
+    /* Extra room below baseline for descenders (g, p, y, j…).
+       Negative margin-bottom cancels the layout effect so flex row height
+       stays identical — only the clip boundary moves. */
+    padding-bottom: 0.32em;
+    margin-bottom: -0.32em;
+  }
+
+  /* Slide up from below the clip boundary on page load */
+  .word-clip .word {
+    animation: heroWordUp 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+
+  @keyframes heroWordUp {
+    from { transform: translateY(110%); }
+    to   { transform: translateY(0); }
+  }
+
+  /* ── Pill entrance: fade + rise (no clip — shadow uses filter:blur) ────── */
+  .hero-entrance {
+    animation: heroPillIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: calc(var(--i, 0) * 50ms);
+  }
+
+  @keyframes heroPillIn {
+    from { opacity: 0; transform: translateY(16px) scale(0.92); }
+    to   { opacity: 1; transform: translateY(0)    scale(1); }
+  }
+
   .hero-pill {
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 130px;
     height: 64px;
-    border-radius: 999px;
     flex-shrink: 0;
-    overflow: hidden;
     position: relative;
+    vertical-align: middle;
   }
 
-  .hero-pill--orange {
-    background: var(--color-orange-500);
-    box-shadow: 0 5px 12px oklch(from var(--color-orange-500) l c h / 0.55);
+  /* Blurred shadow — same pill content, offset down + blurred */
+  .hero-pill__shadow {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    overflow: hidden;
+    filter: blur(12px);
+    opacity: 0.6;
   }
 
-  .hero-pill__glow {
+  /* Main visible pill */
+  .hero-pill__main {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* Portrait pill — orange background layer */
+  .pill-orange-bg {
     position: absolute;
     inset: 0;
-    border-radius: 999px;
-    background: radial-gradient(ellipse at 35% 35%, oklch(from var(--color-orange-500) calc(l + 0.25) calc(c - 0.1) h / 0.45) 0%, transparent 65%);
+    background: var(--color-orange-500);
   }
 
-  .hero-pill--photo { background: var(--color-taupe-300); }
+  /* Portrait photo — positioned to show face in upper-center of pill */
+  .pill-portrait-img {
+    position: absolute;
+    width: 221%;
+    height: auto;
+    left: -60%;
+    top: -49%;
+    max-width: none;
+    pointer-events: none;
+  }
 
-  .hero-pill__img {
+  /* NYC photo — fills pill */
+  .pill-nyc-img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
+    max-width: none;
+    pointer-events: none;
   }
 
   /* ===== ABOUT ZONE ===== */
@@ -250,22 +535,20 @@ const categories = [
   }
 
   .about-content {
-    grid-column: 4 / 8;
+    grid-column: 1 / 6;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
   }
 
   .about-text {
     font-family: var(--font-uncut);
-    font-size: 20px;
-    font-weight: 500;
+    font-size: clamp(0.875rem, 3.5vw, 1.375rem);
     letter-spacing: -0.36px;
     line-height: 1.15;
     color: var(--color-taupe-400);
     margin: 0;
     text-wrap: balance;
-    margin-bottom: 20px;
   }
 
   .about-btn {
@@ -281,54 +564,53 @@ const categories = [
     letter-spacing: -0.28px;
     color: var(--color-taupe-400);
     text-decoration: none;
-    transition: border-color 0.15s, color 0.15s;
+    will-change: transform;
+    transition: border-color 0.15s, color 0.15s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     width: fit-content;
-  }
-
-  .about-btn:hover {
-    border-color: var(--color-orange-500);
-    color: var(--color-orange-500);
   }
 
   /* ===== WORK SECTIONS ===== */
   .work-sections {
     display: flex;
     flex-direction: column;
-    gap: 40px;
-    position: relative;
-    isolation: isolate;
+    gap: 0;
+    padding-bottom: 80px;
   }
 
+  /* Clip container for scroll-triggered text reveals */
+  .reveal-outer {
+    display: block;
+    overflow: hidden;
+  }
+
+  /* Section entry header — large editorial serif */
   .work-heading {
-    position: absolute;
-    top: -40px;
-    left: 0;
-    width: 100%;
     font-family: var(--font-uncut);
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
     font-weight: 700;
-    font-size: 48px;
+    letter-spacing: -0.5px;
     line-height: 1;
-    letter-spacing: -1%;
-    text-transform: uppercase;
     color: var(--color-taupe-300);
-    margin: 0;
-    pointer-events: none;
-    z-index: -1;
+    font-feature-settings: 'ss03' 1, 'ss04' 1, 'dlig' 1;
+    margin: 0 0 48px 0;
   }
 
-  /* Category cards */
+  /* Category sections */
   .category-card {
-    background: white;
-    border-radius: 6px;
-    padding: 10px 20px 40px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
+    margin-top: 72px;
   }
 
+  .category-card:first-of-type {
+    margin-top: 0;
+  }
+
+  /* Category header */
   .category-header {
     display: flex;
-    gap: 2px;
+    gap: 4px;
     align-items: flex-start;
     padding: 24px 0;
     overflow: hidden;
@@ -337,9 +619,16 @@ const categories = [
   .category-name {
     font-family: var(--font-fragment);
     font-size: 24px;
-    letter-spacing: -1%;
+    letter-spacing: -0.24px;
     line-height: 1;
     color: var(--color-orange-950);
+    overflow: hidden; /* clip container for inner reveal-inner */
+    /* Extend clip boundary above & below to prevent ascender/descender clipping.
+       Negative margins cancel the layout effect — only the clip boundary moves. */
+    padding-top: 0.18em;
+    margin-top: -0.18em;
+    padding-bottom: 0.25em;
+    margin-bottom: -0.25em;
   }
 
   .category-count {
@@ -369,6 +658,19 @@ const categories = [
   .project-link {
     display: block;
     text-decoration: none;
+    /* Entrance state: hidden below and transparent until IO triggers */
+    opacity: 0;
+    transform: translateY(40px);
+    will-change: opacity, transform;
+    transition:
+      opacity   0.65s ease,
+      transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--enter-delay, 0ms);
+  }
+
+  .project-link.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .project-link--half {
@@ -384,7 +686,7 @@ const categories = [
 
   .project-row {
     display: flex;
-    gap: 48px;
+    gap: 20px;
     align-items: flex-start;
   }
 
@@ -394,25 +696,38 @@ const categories = [
   }
 
   .project-image {
-    border-radius: 2px;
+    border-radius: 10px;
     overflow: hidden;
     width: 100%;
     position: relative;
     background: var(--color-taupe-300);
   }
 
-  .project-image--wide { aspect-ratio: 1920 / 1080; }
-  .project-image--square { aspect-ratio: 1 / 1; }
+  .project-image--wide   { aspect-ratio: 16 / 9; }
+  .project-image--square { aspect-ratio: 4 / 3; }
 
+  /* JS owns `translate` (parallax); CSS owns `scale` (including hover). */
   .project-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 0.5s ease;
+    scale: 1.08;
+    will-change: translate, scale;
+    transition: scale 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .project-link:hover .project-img { transform: scale(1.01); }
+  /* Orange overlay burn — fades in on hover over the image */
+  .project-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--color-orange-500);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+  }
 
   .project-placeholder {
     width: 100%;
@@ -433,10 +748,89 @@ const categories = [
   .project-title {
     font-size: 16px;
     color: var(--color-orange-950);
+    transition: color 0.2s ease;
   }
 
   .project-cat {
     font-size: 12px;
     color: var(--color-taupe-400);
+  }
+
+  /* ── Hover states — pointer devices only, no tap flash ─────────────────── */
+  @media (hover: hover) {
+    .project-link:hover .project-img        { scale: 1.13; }
+    .project-link:hover .project-image::after { opacity: 0.2; }
+    .project-link:hover .project-title      { color: var(--color-orange-500); }
+    .about-btn:hover {
+      border-color: var(--color-orange-500);
+      color: var(--color-orange-500);
+    }
+  }
+
+  /* ── Reduced motion ──────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .word-clip .word,
+    .hero-entrance {
+      animation: none;
+    }
+
+    .project-link {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    .project-img {
+      transition: none;
+    }
+
+    .footer-word {
+      transition: none;
+    }
+  }
+
+  /* ── Mobile overrides ──────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+
+    /* Hero */
+    .hero-text {
+      padding-top: 40px;
+      min-height: auto;
+      grid-column: 1 / -1;
+      gap: 8px;
+    }
+
+    /* Portrait pill: scale to sit flush with 1.5rem line-height (~28px) */
+    .hero-pill {
+      width: 80px;
+      height: 36px;
+    }
+
+    /* About zone */
+    .about-zone {
+      margin-bottom: 60px;
+    }
+
+    .about-content {
+      grid-column: 1 / -1;
+    }
+
+    /* Stack paired projects into a single column */
+    .project-row {
+      flex-direction: column;
+      gap: 48px; /* match the projects-list gap so stacked cards are evenly spaced */
+    }
+
+    /* Let each half-width card fill the full column width */
+    .project-link--half {
+      flex: none;
+      width: 100%;
+    }
+
+    /* All images 4:3 on mobile — consistent, thumb-friendly */
+    .project-image--wide {
+      aspect-ratio: 4 / 3;
+    }
+
   }
 </style>

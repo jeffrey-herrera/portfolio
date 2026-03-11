@@ -3,6 +3,7 @@ title: "Motion Language"
 description: "Defining Braze's motion design system"
 publishedAt: 2023-11-01
 featured: false
+cover: "/images/projects/project1.webp"
 tags: ["Brand"]
 role: "Associate Creative Director"
 company: "Braze"

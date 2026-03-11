@@ -3,6 +3,7 @@ title: "Braze Rebrand"
 description: "Led the complete brand overhaul for Braze's global identity system"
 publishedAt: 2024-06-01
 featured: true
+cover: "/images/projects/project1.webp"
 tags: ["Brand"]
 role: "Associate Creative Director"
 company: "Braze"
