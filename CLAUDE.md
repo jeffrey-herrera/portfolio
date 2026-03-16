@@ -354,6 +354,12 @@ Scroll observer lives in `src/pages/index.astro` (`initWorkNavScroll`):
 
 ---
 
+## Git Workflow
+
+**Always push to `master` (main branch).** Do not create feature branches unless explicitly asked. If on a feature branch, merge to master before pushing.
+
+---
+
 ## Deployment
 
 Static (`output: "static"`), deployed to Vercel. No SSR adapter. Vercel Analytics via `<Analytics />` in Layout.
