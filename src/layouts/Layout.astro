@@ -107,6 +107,15 @@ const currentPath = Astro.url.pathname;
     align-items: start;
   }
 
+  /* Sidebar sticky — controlled at the layout level so every page
+     gets identical release-at-footer behavior without per-page logic.
+     Natural height means the sidebar releases when its bottom edge
+     meets the content bottom (footer top). */
+  .page-layout :global(.sidebar-sticky) {
+    position: sticky;
+    top: 0;
+  }
+
   @media (max-width: 1023px) {
     .page-layout {
       grid-template-columns: 1fr;
