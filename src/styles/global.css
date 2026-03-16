@@ -1,19 +1,65 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+
+/* ── CSS RESET ───────────────────────────────────────────────── */
+
+/* 1. Use a more-intuitive box-sizing model */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove default margin */
+*:not(dialog) {
+  margin: 0;
+}
+
+/* 3. Enable keyword animations */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    interpolate-size: allow-keywords;
+  }
+}
+
+body {
+  /* 4. Add accessible line-height */
+  line-height: 1.5;
+  /* 5. Improve text rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 6. Improve media defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 7. Inherit fonts for form controls */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 8. Avoid text overflows */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+}
+
+/* 9. Improve line wrapping */
+p {
+  text-wrap: pretty;
+}
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+}
+
+/*
+  10. Create a root stacking context
+*/
+#root, #__next {
+  isolation: isolate;
+}
+
 @theme {
-  /* Neutral scale — kept for ThemeToggle and future dark-mode work */
-  --color-zinc-50:  oklch(98.2% 0.002 247.9);
-  --color-zinc-100: oklch(96.1% 0.004 253.1);
-  --color-zinc-200: oklch(92.6% 0.009 258.0);
-  --color-zinc-300: oklch(87.1% 0.013 261.0);
-  --color-zinc-400: oklch(70.7% 0.016 261.3);
-  --color-zinc-500: oklch(55.2% 0.018 264.0);
-  --color-zinc-600: oklch(44.3% 0.016 261.0);
-  --color-zinc-700: oklch(37.2% 0.013 261.0);
-  --color-zinc-800: oklch(27.5% 0.009 264.0);
-  --color-zinc-900: oklch(20.8% 0.006 265.0);
-  --color-zinc-950: oklch(14.5% 0.004 265.0);
 
   /* ── Brand colors ─────────────────────────────────────────────────────── */
 
@@ -23,6 +69,8 @@
 
   /* Orange scale */
   --color-orange-50:  oklch(98% 0.016 75);   /* #fff7ed */
+  --color-orange-200: oklch(91% 0.10 65);    /* #ffd7a8  hover excerpt text */
+  --color-orange-300: oklch(83% 0.15 55);    /* #ffaa5e  gradient endpoint */
   --color-orange-500: oklch(68% 0.214 43);   /* #ff6900  primary accent */
   --color-orange-900: oklch(38% 0.090 35);   /* #8b2f0c  footer gradient */
   --color-orange-950: oklch(27% 0.078 36);   /* #441306  dark text/ui */

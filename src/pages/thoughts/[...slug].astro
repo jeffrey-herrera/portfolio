@@ -1,0 +1,155 @@
+---
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import MainContent from '../../components/MainContent.astro';
+import BackLink from '../../components/BackLink.astro';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+  const thoughtEntries = await getCollection('thoughts');
+  return thoughtEntries.map(entry => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<Layout title={`${entry.data.title} — Jeff Herrera`} description={entry.data.description}>
+  <MainContent>
+    <div class="page-inner">
+
+      <BackLink href="/thoughts" label="Thoughts" />
+
+      <div class="thought-row row">
+        <div class="thought-main">
+          <header class="thought-header">
+            <h1 class="thought-title">{entry.data.title}</h1>
+            <p class="thought-desc">{entry.data.description}</p>
+          </header>
+
+          <div class="thought-body prose">
+            <Content />
+          </div>
+        </div>
+
+        {entry.data.cover && (
+          <aside class="thought-image-col">
+            <div class="thought-image-sticky">
+              <Image
+                src={entry.data.cover}
+                alt={entry.data.title}
+                width={300}
+                height={400}
+                class="thought-image"
+                loading="eager"
+              />
+            </div>
+          </aside>
+        )}
+      </div>
+
+    </div>
+  </MainContent>
+</Layout>
+
+<style>
+  .page-inner {
+    padding-top: 40px;
+  }
+
+  /* ── Grid row ──────────────────────────────────────────────────────────── */
+  .thought-main {
+    grid-column: 1 / 7;
+  }
+
+  .thought-image-col {
+    grid-column: 7 / -1;
+  }
+
+  .thought-image-sticky {
+    position: sticky;
+    top: 40px;
+  }
+
+  .thought-image {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    display: block;
+  }
+
+  /* ── Header ────────────────────────────────────────────────────────────── */
+  .thought-header {
+    margin-bottom: 48px;
+  }
+
+  .thought-title {
+    font-family: var(--font-fragment);
+    font-size: 48px;
+    line-height: 1.1;
+    letter-spacing: -1.44px;
+    color: var(--color-orange-950);
+    margin: 0 0 16px;
+  }
+
+  .thought-desc {
+    font-family: var(--font-uncut);
+    font-size: clamp(1.25rem, calc(1.1rem + 0.75vw), 1.5rem);
+    font-weight: 400;
+    line-height: 1.35;
+    color: var(--color-taupe-400);
+    margin: 10px 0;
+  }
+
+  /* ── Body ──────────────────────────────────────────────────────────────── */
+  .thought-body {
+    font-family: var(--font-uncut);
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--color-orange-950);
+    margin-top: 60px;
+  }
+
+  .thought-body :global(h2) {
+    font-family: var(--font-fragment);
+    font-size: 28px;
+    letter-spacing: -0.56px;
+    color: var(--color-orange-950);
+    margin: 40px 0 16px;
+  }
+
+  .thought-body :global(p) {
+    margin: 0 0 24px;
+    color: var(--color-taupe-500);
+  }
+
+  .thought-body :global(a) {
+    color: var(--color-orange-500);
+    text-decoration: none;
+  }
+
+  .thought-body :global(a:hover) {
+    text-decoration: underline;
+  }
+
+  /* ── Mobile ────────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .thought-main,
+    .thought-image-col {
+      grid-column: 1 / -1;
+    }
+
+    .thought-image-sticky {
+      position: static;
+    }
+
+    .thought-image {
+      margin-top: 40px;
+    }
+  }
+
+
+</style>

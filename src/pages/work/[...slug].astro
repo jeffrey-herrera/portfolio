@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import MainContent from '../../components/MainContent.astro';
 import RelatedProjects from '../../components/RelatedProjects.astro';
 import Tag from '../../components/Tag.astro';
+import BackLink from '../../components/BackLink.astro';
 import { Image } from 'astro:assets';
 
 export async function getStaticPaths() {
@@ -22,7 +23,7 @@ const { Content } = await entry.render();
   <MainContent>
     <div class="page-inner">
 
-      <a href="/" class="back-link">← Work</a>
+      <BackLink href="/" label="Work" />
 
       <header class="work-header">
         <!-- work-title is intentionally a local <h1> — it uses different sizing
@@ -67,22 +68,9 @@ const { Content } = await entry.render();
 <style>
   .page-inner {
     padding-top: 40px;
-    max-width: 760px;
-  }
+    /* max-width: 760px; */
 
-  .back-link {
-    display: inline-block;
-    font-family: var(--font-uncut);
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: -0.14px;
-    color: var(--color-taupe-400);
-    text-decoration: none;
-    margin-bottom: 80px;
-    transition: color 0.15s;
   }
-
-  .back-link:hover { color: var(--color-orange-500); }
 
   .work-header {
     margin-bottom: 48px;

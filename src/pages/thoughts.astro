@@ -1,0 +1,183 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MainContent from '../components/MainContent.astro';
+import PageTitle from '../components/PageTitle.astro';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import { formatReadTime, getReadTimeMinutes } from '../utils/readTime';
+
+const allThoughts = await getCollection('thoughts');
+const sortedThoughts = allThoughts
+  .sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf())
+  .map((thought) => ({
+    ...thought,
+    readTimeMinutes: getReadTimeMinutes(thought.body),
+  }));
+---
+
+<Layout title="Thoughts — Jeff Herrera" description="Writing about design, creativity, and how I think about creative work.">
+  <MainContent>
+
+    <PageTitle title="Thoughts" subtitle="Writing about design, creativity, and creative work." />
+
+    {sortedThoughts.length === 0 ? (
+      <p class="empty-state">No posts yet. Add writing in <code>src/content/thoughts/</code></p>
+    ) : (
+      <div class="row">
+        <div class="thoughts-list">
+          {sortedThoughts.map((thought) => (
+            <a
+              href={`/thoughts/${thought.slug}`}
+              class="post-item"
+              data-cursor-label={`Read (${formatReadTime(thought.readTimeMinutes)})`}
+            >
+              <div class={`post-thumb${!thought.data.cover ? ' post-thumb--placeholder' : ''}`}>
+                {thought.data.cover && (
+                  <Image
+                    src={thought.data.cover}
+                    alt=""
+                    aria-hidden="true"
+                    width={120}
+                    height={120}
+                    class="post-thumb-img"
+                  />
+                )}
+              </div>
+              <div class="post-text">
+                <h2 class="post-title">{thought.data.title}</h2>
+                <p class="post-excerpt">{thought.data.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+  </MainContent>
+</Layout>
+
+<style>
+  .empty-state {
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    color: var(--color-taupe-400);
+    margin: 0;
+  }
+
+  .empty-state code {
+    font-family: monospace;
+    font-size: 13px;
+    background: var(--color-white);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .thoughts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    grid-column: 1/7;
+  }
+
+  .post-item {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    background: var(--color-white);
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+
+  .post-thumb {
+    flex-shrink: 0;
+    width: 120px;
+    height: 120px;
+    border-radius: 2px;
+    overflow: hidden;
+    background: var(--color-taupe-300);
+  }
+
+  .post-thumb--placeholder {
+    background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-300));
+  }
+
+  .post-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .post-text {
+    display: flex;
+    flex-direction: column;
+    /* gap: 8px; */
+  }
+
+  .post-title {
+    font-family: var(--font-uncut);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.44px;
+    line-height: 1.2;
+    color: var(--color-taupe-500);
+    margin: 0;
+    transition: color 0.2s;
+  }
+
+  .post-excerpt {
+    font-family: var(--font-uncut);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: -0.18px;
+    line-height: 1.4;
+    color: var(--color-taupe-500);
+    margin: 0;
+    transition: color 0.2s;
+  }
+
+  /* Hover — pointer devices only */
+  @media (hover: hover) {
+    .post-item:hover {
+      background: var(--color-orange-950);
+    }
+
+    .post-item:hover .post-title {
+      color: var(--color-orange-50);
+    }
+
+    .post-item:hover .post-excerpt {
+      color: var(--color-orange-500);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-item,
+    .post-title,
+    .post-excerpt {
+      transition: none;
+    }
+  }
+
+  /* ── Mobile ───────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .post-item {
+      gap: 20px;
+      padding: 16px;
+    }
+
+    .post-thumb {
+      width: 80px;
+      height: 80px;
+    }
+
+    .post-title {
+      font-size: 18px;
+    }
+
+    .post-excerpt {
+      font-size: 15px;
+    }
+  }
+</style>

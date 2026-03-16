@@ -10,7 +10,7 @@ const { currentPath = '/' } = Astro.props;
 const navItems = [
   { href: '/', label: 'Work' },
   { href: '/about', label: 'About' },
-  { href: '/playground', label: 'Playground' },
+  { href: '/thoughts', label: 'Thoughts' },
   { href: '/playlists', label: 'Playlists' },
 ];
 
@@ -25,6 +25,8 @@ const isHome = currentPath === '/';
 
 <!-- ─── Desktop sidebar ────────────────────────────────────────────────────── -->
 <aside class="sidebar">
+
+  <div class="sidebar-sticky">
 
   <!-- Logo -->
   <div class="sidebar-item">
@@ -87,6 +89,8 @@ const isHome = currentPath === '/';
       </button>
     </div>
   )}
+
+  </div>
 
 </aside>
 
@@ -151,12 +155,16 @@ const isHome = currentPath === '/';
   /* ─── Desktop sidebar ──────────────────────────────────────────────────── */
   .sidebar {
     grid-column: 1/3;
+    align-self: stretch;
+  }
+
+  .sidebar-sticky {
     position: sticky;
     top: 0;
     padding-top: 40px;
     padding-left: 40px;
     padding-bottom: 40px;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
@@ -273,7 +281,7 @@ const isHome = currentPath === '/';
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.4s ease;
-    z-index: 100;
+    z-index: 500;
   }
 
   .sidebar-back-top.visible {
@@ -335,14 +343,12 @@ const isHome = currentPath === '/';
     }
 
     /* Logo color transitions when header context changes.
-       :global() targets .logo-outer/.logo-inner inside the Logo component. */
-    .mobile-header :global(.logo-outer),
-    .mobile-header :global(.logo-inner) {
+       :global() targets .logo-outer inside the Logo component. */
+    .mobile-header :global(.logo-outer) {
       transition: fill 0.3s ease;
     }
 
     .mobile-header.menu-is-open :global(.logo-outer) { fill: var(--color-orange-50); }
-    .mobile-header.menu-is-open :global(.logo-inner) { fill: var(--color-orange-500); }
   }
 
 
