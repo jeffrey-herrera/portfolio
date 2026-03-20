@@ -23,33 +23,31 @@ const sortedThoughts = allThoughts
     {sortedThoughts.length === 0 ? (
       <p class="empty-state">No posts yet. Add writing in <code>src/content/thoughts/</code></p>
     ) : (
-      <div class="row">
-        <div class="thoughts-list">
-          {sortedThoughts.map((thought) => (
-            <a
-              href={`/thoughts/${thought.slug}`}
-              class="post-item"
-              data-cursor-label={`Read (${formatReadTime(thought.readTimeMinutes)})`}
-            >
-              <div class={`post-thumb${!thought.data.cover ? ' post-thumb--placeholder' : ''}`}>
-                {thought.data.cover && (
-                  <Image
-                    src={thought.data.cover}
-                    alt=""
-                    aria-hidden="true"
-                    width={120}
-                    height={120}
-                    class="post-thumb-img"
-                  />
-                )}
-              </div>
-              <div class="post-text">
-                <h2 class="post-title">{thought.data.title}</h2>
-                <p class="post-excerpt">{thought.data.description}</p>
-              </div>
-            </a>
-          ))}
-        </div>
+      <div class="thoughts-grid">
+        {sortedThoughts.map((thought) => (
+          <a
+            href={`/thoughts/${thought.slug}`}
+            class="post-card"
+            data-cursor-label={`Read (${formatReadTime(thought.readTimeMinutes)})`}
+          >
+            <div class={`post-cover${!thought.data.cover ? ' post-cover--placeholder' : ''}`}>
+              {thought.data.cover && (
+                <Image
+                  src={thought.data.cover}
+                  alt=""
+                  aria-hidden="true"
+                  width={600}
+                  height={338}
+                  class="post-cover-img"
+                />
+              )}
+            </div>
+            <div class="post-text">
+              <h2 class="post-title">{thought.data.title}</h2>
+              <p class="post-excerpt">{thought.data.description}</p>
+            </div>
+          </a>
+        ))}
       </div>
     )}
 
@@ -72,47 +70,73 @@ const sortedThoughts = allThoughts
     border-radius: 3px;
   }
 
-  .thoughts-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    grid-column: 1/7;
+  /* ── Card grid ───────────────────────────────────────────────────────── */
+  .thoughts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px 20px;
   }
 
-  .post-item {
+  /* ── Portrait card ───────────────────────────────────────────────────── */
+  .post-card {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 20px 36px;
     background: var(--color-white);
     border-radius: 10px;
     text-decoration: none;
+    position: relative;
     transition: background 0.2s;
   }
 
-  .post-thumb {
-    flex-shrink: 0;
-    width: 120px;
-    height: 120px;
+  /* Decorative cutout circles — cream discs that punch through the card */
+  .post-card::before,
+  .post-card::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-cream);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .post-card::before {
+    top: -20px;
+  }
+
+  .post-card::after {
+    bottom: -20px;
+  }
+
+  /* ── Cover image ─────────────────────────────────────────────────────── */
+  .post-cover {
+    aspect-ratio: 16 / 9;
     border-radius: 2px;
     overflow: hidden;
     background: var(--color-taupe-300);
   }
 
-  .post-thumb--placeholder {
+  .post-cover--placeholder {
     background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-300));
   }
 
-  .post-thumb-img {
+  .post-cover-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
 
+  /* ── Text ─────────────────────────────────────────────────────────────── */
   .post-text {
     display: flex;
     flex-direction: column;
-    /* gap: 8px; */
+    gap: 8px;
   }
 
   .post-title {
@@ -124,6 +148,7 @@ const sortedThoughts = allThoughts
     color: var(--color-taupe-500);
     margin: 0;
     transition: color 0.2s;
+    font-feature-settings: 'dlig' 1;
   }
 
   .post-excerpt {
@@ -135,41 +160,36 @@ const sortedThoughts = allThoughts
     color: var(--color-taupe-500);
     margin: 0;
     transition: color 0.2s;
+    font-feature-settings: 'dlig' 1;
   }
 
-  /* Hover — pointer devices only */
+  /* ── Hover — dark card variant (pointer devices only) ────────────────── */
   @media (hover: hover) {
-    .post-item:hover {
+    .post-card:hover {
       background: var(--color-orange-950);
     }
 
-    .post-item:hover .post-title {
+    .post-card:hover .post-title {
       color: var(--color-orange-50);
     }
 
-    .post-item:hover .post-excerpt {
+    .post-card:hover .post-excerpt {
       color: var(--color-orange-500);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .post-item,
+    .post-card,
     .post-title,
     .post-excerpt {
       transition: none;
     }
   }
 
-  /* ── Mobile ───────────────────────────────────────────────────────────── */
+  /* ── Mobile ──────────────────────────────────────────────────────────── */
   @media (max-width: 1023px) {
-    .post-item {
-      gap: 20px;
-      padding: 16px;
-    }
-
-    .post-thumb {
-      width: 80px;
-      height: 80px;
+    .thoughts-grid {
+      grid-template-columns: 1fr;
     }
 
     .post-title {
