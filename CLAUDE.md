@@ -225,6 +225,7 @@ Reference dimensions by context:
 | Project card wide (index first) | 800 | 500 | eager |
 | Project card half (index rest) | 400 | 400 | lazy |
 | Work detail cover | 760 | 480 | eager |
+| Thoughts detail sidebar | 400 | 225 | eager |
 | Playground covers | 600 | 338 | lazy |
 
 ---

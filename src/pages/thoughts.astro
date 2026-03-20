@@ -116,13 +116,12 @@ const sortedThoughts = allThoughts
   /* ── Cover image ─────────────────────────────────────────────────────── */
   .post-cover {
     aspect-ratio: 16 / 9;
-    border-radius: 2px;
-    overflow: hidden;
     background: var(--color-taupe-300);
   }
 
   .post-cover--placeholder {
     background: linear-gradient(135deg, var(--color-orange-500), var(--color-orange-300));
+    border-radius: 2px;
   }
 
   .post-cover-img {
@@ -130,6 +129,7 @@ const sortedThoughts = allThoughts
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 2px;
   }
 
   /* ── Text ─────────────────────────────────────────────────────────────── */
@@ -198,6 +198,44 @@ const sortedThoughts = allThoughts
 
     .post-excerpt {
       font-size: 15px;
+    }
+  }
+</style>
+
+<script>
+  function initCardExit() {
+    document.querySelectorAll<HTMLElement>('.post-card').forEach(card => {
+      card.addEventListener('click', () => {
+        // Clear any previously tagged card
+        document.querySelectorAll<HTMLElement>('.post-card').forEach(c => {
+          c.style.viewTransitionName = '';
+        });
+        card.style.viewTransitionName = 'thought-card-active';
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initCardExit);
+</script>
+
+<style is:global>
+  @keyframes thoughtCardExit {
+    from { opacity: 1; transform: translateY(0); }
+    to   { opacity: 0; transform: translateY(-20px); }
+  }
+
+  ::view-transition-old(thought-card-active) {
+    animation: thoughtCardExit 0.4s cubic-bezier(0.25, 0, 0, 1) both;
+  }
+
+  /* No matching element on detail page — suppress phantom new snapshot */
+  ::view-transition-new(thought-card-active) {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(thought-card-active) {
+      animation: none;
     }
   }
 </style>

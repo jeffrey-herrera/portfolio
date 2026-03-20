@@ -25,13 +25,15 @@ const { Content } = await entry.render();
 
       <div class="thought-row row">
         <div class="thought-main">
-          <header class="thought-header">
-            <h1 class="thought-title">{entry.data.title}</h1>
-            <p class="thought-desc">{entry.data.description}</p>
-          </header>
+          <div class="thought-content">
+            <header class="thought-header">
+              <h1 class="thought-title">{entry.data.title}</h1>
+              <p class="thought-desc">{entry.data.description}</p>
+            </header>
 
-          <div class="thought-body prose">
-            <Content />
+            <div class="thought-body prose">
+              <Content />
+            </div>
           </div>
         </div>
 
@@ -41,8 +43,8 @@ const { Content } = await entry.render();
               <Image
                 src={entry.data.cover}
                 alt={entry.data.title}
-                width={300}
-                height={400}
+                width={400}
+                height={225}
                 class="thought-image"
                 loading="eager"
               />
@@ -60,7 +62,7 @@ const { Content } = await entry.render();
     padding-top: 40px;
   }
 
-  /* ── Grid row ──────────────────────────────────────────────────────────── */
+  /* ── Two-column row ─────────────────────────────────────────────────────── */
   .thought-main {
     grid-column: 1 / 7;
   }
@@ -77,11 +79,44 @@ const { Content } = await entry.render();
   .thought-image {
     width: 100%;
     height: auto;
-    border-radius: 6px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
     display: block;
+    border-radius: 4px;
   }
 
-  /* ── Header ────────────────────────────────────────────────────────────── */
+  /* ── Content ────────────────────────────────────────────────────────────── */
+  .thought-content {
+    /* no max-width — constrained by grid column */
+  }
+
+  @keyframes thoughtFadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .thought-content.is-entering {
+    animation: thoughtFadeUp 0.5s cubic-bezier(0.25, 0, 0, 1) 0.15s both;
+  }
+
+  .thought-image.is-entering {
+    animation: thoughtFadeUp 0.5s cubic-bezier(0.25, 0, 0, 1) 0.25s both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thought-content.is-entering,
+    .thought-image.is-entering {
+      animation: none;
+    }
+  }
+
+  /* ── Header ─────────────────────────────────────────────────────────────── */
   .thought-header {
     margin-bottom: 48px;
   }
@@ -104,13 +139,12 @@ const { Content } = await entry.render();
     margin: 10px 0;
   }
 
-  /* ── Body ──────────────────────────────────────────────────────────────── */
+  /* ── Body ───────────────────────────────────────────────────────────────── */
   .thought-body {
     font-family: var(--font-uncut);
     font-size: 18px;
     line-height: 1.7;
     color: var(--color-orange-950);
-    margin-top: 60px;
   }
 
   .thought-body :global(h2) {
@@ -135,7 +169,7 @@ const { Content } = await entry.render();
     text-decoration: underline;
   }
 
-  /* ── Mobile ────────────────────────────────────────────────────────────── */
+  /* ── Mobile ─────────────────────────────────────────────────────────────── */
   @media (max-width: 1023px) {
     .thought-main,
     .thought-image-col {
@@ -144,12 +178,26 @@ const { Content } = await entry.render();
 
     .thought-image-sticky {
       position: static;
-    }
-
-    .thought-image {
       margin-top: 40px;
     }
+
+    .thought-title {
+      font-size: 36px;
+    }
+  }
+</style>
+
+<script>
+  function initContentEntrance() {
+    const els = document.querySelectorAll<HTMLElement>('.thought-content, .thought-image');
+    els.forEach(el => {
+      el.classList.remove('is-entering');
+      void el.offsetWidth; // force reflow to restart animation
+      el.classList.add('is-entering');
+    });
   }
 
+  // Fire on first load and after every view-transition swap
+  document.addEventListener('astro:page-load', initContentEntrance);
+</script>
 
-</style>
