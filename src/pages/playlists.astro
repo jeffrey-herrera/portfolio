@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import MainContent from '../components/MainContent.astro';
 import PageTitle from '../components/PageTitle.astro';
 import Button from '../components/Button.astro';
+import { Image } from 'astro:assets';
 import { playlists } from '../data/playlists.ts';
 import { getSeason } from '../utils/seasons.ts';
 
@@ -116,13 +117,12 @@ const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
                 >
                   <div class="card-cover" data-cursor-label="Listen">
                     <div class="card-shimmer" aria-hidden="true"></div>
-                    <img
+                    <Image
                       src={playlist.coverUrl}
                       alt={playlist.name}
-                      width="400"
-                      height="400"
+                      width={400}
+                      height={400}
                       loading="lazy"
-                      decoding="async"
                       class="card-img"
                     />
                   </div>

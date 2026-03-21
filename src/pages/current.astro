@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import MainContent from '../components/MainContent.astro';
 import PageTitle from '../components/PageTitle.astro';
+import { Image } from 'astro:assets';
 import { inspoImages } from '../data/inspo';
 
 const lastUpdated = 'March 2026';
@@ -18,11 +19,12 @@ const lastUpdated = 'March 2026';
     <div class="board-grid">
       {inspoImages.map((img, i) => (
         <div class="board-card board-card--img">
-          <img
+          <Image
             src={`/images/inspo/${img.id}.jpg`}
             alt={img.alt}
+            width={600}
+            height={600}
             loading={i < 10 ? 'eager' : 'lazy'}
-            decoding="async"
             class="board-img"
             aria-hidden={img.alt ? undefined : 'true'}
           />
@@ -83,7 +85,7 @@ const lastUpdated = 'March 2026';
 
 
   @media (prefers-reduced-motion: reduce) {
-    .board-img { transition: opacity 0.5s ease; }
+    .board-img { transition: none; }
   }
 
   /* ── Last updated ────────────────────────────────────────────────────────── */
