@@ -15,7 +15,7 @@ const byYear = playlists.reduce(
 const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
 ---
 
-<Layout title="Playlists — Jeff Herrera" description="A monthly soundtrack, from 2020 to now.">
+<Layout title="Playlists — Jeff Herrera" description="Songs for every season — Let's jam.">
 
   <!-- Platform glow overlays — cross-faded by JS on platform toggle -->
   <div class="platform-glow platform-glow--spotify" id="glow-spotify" aria-hidden="true"></div>
@@ -23,7 +23,7 @@ const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
 
   <MainContent>
 
-    <PageTitle title="Playlists" subtitle="A monthly soundtrack." />
+    <PageTitle title="Playlists" subtitle="Songs for every season — Let's jam." />
 
     <!-- ── Filter bar ──────────────────────────────────────────────────────── -->
     <div class="filter-bar" id="filter-bar" data-platform="spotify">
@@ -407,6 +407,19 @@ const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
     const playlistCards = document.querySelectorAll<HTMLAnchorElement>('.playlist-card');
     const noResults     = document.getElementById('no-results')   as HTMLElement | null;
 
+    // Apply transitions inline so Tailwind v4 CSS processing doesn't strip them
+    playlistCards.forEach(card => {
+      card.style.transitionProperty = 'opacity';
+      card.style.transitionDuration = '0.4s';
+      card.style.transitionTimingFunction = 'ease';
+      const img = card.querySelector<HTMLImageElement>('.card-img');
+      if (img) {
+        img.style.transitionProperty = 'filter';
+        img.style.transitionDuration = '0.4s';
+        img.style.transitionTimingFunction = 'ease';
+      }
+    });
+
     // Reset state
     currentPlatform = 'spotify';
     currentYear     = '';
@@ -483,10 +496,12 @@ const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
       const cover = img.closest<HTMLElement>('.card-cover');
       if (!cover) return;
       const onLoaded = () => cover.classList.add('img-loaded');
-      if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) {
-        onLoaded();
-      } else {
-        img.addEventListener('load', onLoaded, { once: true });
+      const onError = () => { (img as HTMLImageElement).style.display = 'none'; };
+      img.addEventListener('load', onLoaded, { once: true });
+      img.addEventListener('error', onError, { once: true });
+      if ((img as HTMLImageElement).complete) {
+        if ((img as HTMLImageElement).naturalWidth > 0) onLoaded();
+        else onError();
       }
     });
   }
@@ -741,6 +756,10 @@ const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  .card--no-url .card-img {
+    filter: saturate(0.5);
   }
 
   /* ── Cover: square 1:1, hosts holo pseudo-elements ───────────────────────── */

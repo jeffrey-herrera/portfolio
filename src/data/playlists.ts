@@ -11,15 +11,15 @@ export interface Playlist {
 }
 
 export const playlists: Playlist[] = [
-  {
-    name: 'Dec \'25',
-    month: 'Dec',
-    year: 2025,
-    spotifyUrl: 'https://open.spotify.com/playlist/0cfVTgJhpdyjNxxlXIhoFg?si=ed4662c3b0174d7b',
-    appleMusicUrl: 'https://music.apple.com/us/playlist/dec-25/pl.u-Ymb0J1ycPjVMlM',
-    coverUrl: '/images/playlists/dec-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
-  },
+  // {
+  //   name: 'Dec \'25',
+  //   month: 'Dec',
+  //   year: 2025,
+  //   spotifyUrl: 'https://open.spotify.com/playlist/0cfVTgJhpdyjNxxlXIhoFg?si=ed4662c3b0174d7b',
+  //   appleMusicUrl: 'https://music.apple.com/us/playlist/dec-25/pl.u-Ymb0J1ycPjVMlM',
+  //   coverUrl: '/images/playlists/dec-25.png',
+  //   featuredTrack: 'Passo Bem - Solto Atlxs',
+  // },
   {
     name: 'Nov \'25',
     month: 'Nov',
@@ -27,7 +27,7 @@ export const playlists: Playlist[] = [
     spotifyUrl: 'https://open.spotify.com/playlist/2tos8rf4Hx5Mm8jxdLAwD9?si=f1ed7d47c4524727',
     appleMusicUrl: 'https://music.apple.com/us/playlist/nov-25/pl.u-6mo4rRKiBPJVrV',
     coverUrl: '/images/playlists/nov-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    featuredTrack: 'Cero a la Izquierda - Bautista',
   },
   {
     name: 'Oct \'25',
@@ -36,7 +36,7 @@ export const playlists: Playlist[] = [
     spotifyUrl: 'https://open.spotify.com/playlist/1tRPpKqOYQ6cwgOFIssnFP?si=0f1f3e62fa614dd0',
     appleMusicUrl: 'https://music.apple.com/us/playlist/oct-25/pl.u-vxy6k1XFzyM595',
     coverUrl: '/images/playlists/oct-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    featuredTrack: 'White Lighter - Jean Dawson',
   },
   {
     name: 'Sep \'25',
@@ -45,7 +45,7 @@ export const playlists: Playlist[] = [
     spotifyUrl: 'https://open.spotify.com/playlist/0MbtvkKUKqTuNLJCu3Pghd?si=be2f43ea76524d8d',
     appleMusicUrl: 'https://music.apple.com/us/playlist/sep-25/pl.u-leyllRGTjLJvqv',
     coverUrl: '/images/playlists/sep-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    featuredTrack: 'Everyone - JMSN',
   },
   {
     name: 'Aug \'25',
@@ -54,7 +54,7 @@ export const playlists: Playlist[] = [
     spotifyUrl: 'https://open.spotify.com/playlist/2iIECBepUL1px6wx4yVH9d?si=77f4d15cd3564430',
     appleMusicUrl: 'https://music.apple.com/us/playlist/aug-25/pl.u-PDb4466uLN8rar',
     coverUrl: '/images/playlists/aug-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    featuredTrack: 'Lonyo! - Bakar',
   },
   {
     name: 'Jul \'25',
@@ -62,8 +62,8 @@ export const playlists: Playlist[] = [
     year: 2025,
     spotifyUrl: 'https://open.spotify.com/playlist/2p3D10vOFz8EaxzG6j4NkP?si=7ccae507257c48d2',
     appleMusicUrl: 'https://music.apple.com/us/playlist/jul-25/pl.u-Ymb00pgSPjVMlM',
-    coverUrl: '/images/playlists/july-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    coverUrl: '/images/playlists/jul-25.png',
+    featuredTrack: 'Duele - Joselito KE, D. Dramatico',
   },
   {
     name: 'Jun \'25',
@@ -71,8 +71,8 @@ export const playlists: Playlist[] = [
     year: 2025,
     spotifyUrl: 'https://open.spotify.com/playlist/5ATQuXWVqRFhasptKUt7m5?si=036c2918567f4453',
     appleMusicUrl: 'https://music.apple.com/us/playlist/jun-25/pl.u-LdbqqeBTxWy0J0',
-    coverUrl: '/images/playlists/june-25.png',
-    featuredTrack: 'Passo Bem - Solto Atlxs',
+    coverUrl: '/images/playlists/jun-25.png',
+    featuredTrack: 'Get Me - Nate Brazier',
   },
   {
     name: 'May \'25',
@@ -123,8 +123,8 @@ export const playlists: Playlist[] = [
     name: 'All in One: 2024',
     month: 'Jan',
     year: 2024,
-    spotifyUrl: 'https://open.spotify.com/playlist/37i9dQZF1FoRv41oV03JgG?si=0b44139110874625',
-    appleMusicUrl: '',
+    spotifyUrl: 'https://open.spotify.com/playlist/2w86wH7hoxs1hZ9kMd1H89?si=d112d06f12024c59',
+    appleMusicUrl: 'https://music.apple.com/us/playlist/2024/pl.u-Zmblzgrs0vgkAk',
     coverUrl: '/images/playlists/all-in-one-2024.jpg',
     featuredTrack: '',
   },
