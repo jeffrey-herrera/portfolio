@@ -30,12 +30,11 @@ const portraits = [
     <div class="page-inner row">
       <div class="page-body">
         <p>
-          I'm Jeff, a creative director based in NYC, and I share my creative space with my <s>overlord</s> cat Taco, who has strong opinions and zero interest in mine. My focus is on building the conditions that make good creative repeatable: strong brand systems, clear process, and a way of working that gives teams room to do their best work. I've found that good structure creates more space for craft, not less. AI fits into that thinking the same way, helping everyone get to clarity faster and see ideas well enough to act.
+          I'm Jeff, a creative director based in NYC, and I share my creative space with my <s>overlord</s> cat Taco, who has strong opinions and zero interest in mine. With a decade of experience across in-house and freelance roles, I specialize in brand consistency at scale, creative direction for product storytelling, and experiential design. A lot of that work has lived in tech and SaaS, where making complex products feel understandable is half the job...and the other half is keeping up with how fast everything changes.
         </p>
         <p>
-          With a decade of experience across in-house and freelance roles, I specialize in brand consistency at scale, creative direction for product storytelling, and experiential design. A lot of that work has lived in tech and SaaS, where making complex products feel understandable is half the job...and the other half is keeping up with how fast everything changes.
+          My focus is on building the conditions that make good creative repeatable: strong brand systems, clear process, and a way of working that gives teams room to do their best work. I've found that good structure creates more space for craft, not less. AI fits into that thinking the same way, helping everyone get to clarity faster and see ideas well enough to act.
         </p>
-        <br />
         <p>
           Some concepts I've been thinking about lately are:
           <ul>
@@ -97,6 +96,70 @@ const portraits = [
 </Layout>
 
 <script>
+  // ── Portrait strip scatter → snap entrance ───────────────────────────────
+  // Each pill starts scattered off-screen (random position + rotation), then
+  // springs into its natural strip position with a staggered delay.
+  // Respects prefers-reduced-motion — if reduced, pills appear immediately.
+  function initPortraitScatter() {
+    const pills = Array.from(document.querySelectorAll<HTMLElement>('.portrait-pill'));
+    const strip = document.querySelector<HTMLElement>('.portrait-strip');
+    if (!pills.length || !strip) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // The strip has clip-path: inset(0 0 0 -9999px) which clips its top and bottom
+    // edges exactly at the strip boundary. Scattered pills flying in from below
+    // would be invisible until they crossed that boundary.
+    // Temporarily open the clip (400px above + below) so the full scatter is visible,
+    // then restore the original value once all pills have landed.
+    strip.style.clipPath = 'inset(-400px 0 -400px -9999px)';
+
+    // All pills share the same starting offset — bottom-right — so they read
+    // as arriving in formation rather than scattering from random positions.
+    const OFFSET_X =    0; // no horizontal shift — straight up
+    const OFFSET_Y =   32; // px below — subtle lift distance
+    const OFFSET_R =    0; // no tilt
+
+    pills.forEach(pill => {
+      pill.style.opacity   = '0';
+      pill.style.transform = `translate(${OFFSET_X}px, ${OFFSET_Y}px) rotate(${OFFSET_R}deg)`;
+      pill.style.transition = 'none';
+    });
+
+    // Staggered entrance: each pill transitions to its natural position
+    // Slow, smooth ease-out (not a spring) gives a premium, intentional feel.
+    const ENTER_DURATION  = 1000;  // ms — snappy but not jarring
+    const ENTER_EASING    = 'cubic-bezier(0.16, 1, 0.3, 1)'; // spring ease — matches site-wide feel
+    const STAGGER         = 100;   // ms between each pill
+    const START_DELAY     = 100;   // ms before the first pill moves
+    const lastDelay       = START_DELAY + (pills.length - 1) * STAGGER;
+    const totalDuration   = lastDelay + ENTER_DURATION + 200;
+
+    pills.forEach((pill, i) => {
+      const delay = START_DELAY + i * STAGGER;
+
+      setTimeout(() => {
+        pill.style.transition =
+          `opacity 0.3s ${ENTER_EASING},
+           transform ${ENTER_DURATION}ms ${ENTER_EASING}`;
+        pill.style.opacity   = '1';
+        pill.style.transform = '';
+      }, delay);
+
+      // Remove inline styles after animation settles so drag works unimpeded
+      setTimeout(() => {
+        pill.style.transition = '';
+        pill.style.opacity    = '';
+        pill.style.transform  = '';
+      }, delay + ENTER_DURATION + 120);
+    });
+
+    // Restore the original clip-path once every pill has fully settled
+    setTimeout(() => {
+      strip.style.clipPath = '';
+    }, totalDuration);
+  }
+
   // ── Draggable portrait strip ────────────────────────────────────────────────
   // Uses the Pointer Events API so mouse and touch both work.
   // Momentum: on pointer-up, velocity decays at 94% per frame until < 0.4px/frame.
@@ -169,15 +232,20 @@ const portraits = [
     }, { once: true });
   }
 
-  initPortraitDrag();
-  document.addEventListener('astro:after-swap', initPortraitDrag);
+  function initAll() {
+    initPortraitScatter();
+    initPortraitDrag();
+  }
+
+  initAll();
+  document.addEventListener('astro:after-swap', initAll);
 </script>
 
 <style>
   /* ── Main body text ─────────────────────────────────────────────────────── */
   .page-body {
     font-family: var(--font-uncut);
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1.6;
     color: var(--color-taupe-500);

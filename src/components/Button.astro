@@ -1,0 +1,191 @@
+---
+/**
+ * Button — shared button/link component
+ *
+ * Variants:
+ *   secondary    — outlined pill (taupe border), used as the "About" CTA on home
+ *   primary      — solid orange-500 fill
+ *   primary-dark — solid orange-950 fill (footer CTA)
+ *   premium      — orange→amber gradient with glow shadow ("Feeling Lucky")
+ *
+ * Sizes (each variant has a sensible default, override with `size`):
+ *   sm  — 34px height, 12px font  (filter bar buttons)
+ *   md  — 12px 20px padding, 16px font  (hero CTAs)
+ *   lg  — 16px 24px padding, 15px font  (footer CTA)
+ *
+ * Renders as <a> when `href` is provided, <button> otherwise.
+ */
+
+interface Props {
+  variant?:  'secondary' | 'primary' | 'primary-dark' | 'premium';
+  size?:     'sm' | 'md' | 'lg';
+  href?:     string;
+  target?:   string;
+  rel?:      string;
+  type?:     'button' | 'submit' | 'reset';
+  class?:    string;
+  id?:       string;
+  disabled?: boolean;
+  [key: string]: unknown; // passthrough for data-* attributes
+}
+
+const {
+  variant  = 'secondary',
+  size,
+  href,
+  target,
+  rel,
+  type     = 'button',
+  class: className,
+  id,
+  disabled,
+  ...rest
+} = Astro.props;
+
+// Default size per variant
+const defaultSize: Record<string, 'sm' | 'md' | 'lg'> = {
+  'secondary':    'md',
+  'primary':      'sm',
+  'primary-dark': 'lg',
+  'premium':      'sm',
+};
+const resolvedSize = size ?? defaultSize[variant] ?? 'md';
+const classes = ['btn', `btn--${variant}`, `btn--${resolvedSize}`, className].filter(Boolean).join(' ');
+---
+
+{href ? (
+  <a
+    href={href}
+    class={classes}
+    target={target}
+    rel={rel}
+    id={id}
+    aria-disabled={disabled ? 'true' : undefined}
+    {...rest}
+  >
+    <slot />
+  </a>
+) : (
+  <button
+    type={type}
+    class={classes}
+    id={id}
+    disabled={disabled}
+    {...rest}
+  >
+    <slot />
+  </button>
+)}
+
+<style>
+  /* ── Base ────────────────────────────────────────────────────────────────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    font-family: var(--font-uncut);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition:
+      background     0.15s ease,
+      color          0.15s ease,
+      border-color   0.15s ease,
+      box-shadow     0.25s ease,
+      filter         0.15s ease;
+    will-change: transform;
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ── Sizes ───────────────────────────────────────────────────────────────── */
+  .btn--sm {
+    height: 40px;
+    padding: 0 20px;
+    font-size: 16px;
+    letter-spacing: -0.16px;
+    line-height: 1;
+  }
+
+  .btn--md {
+    padding: 12px 20px;
+    font-size: 16px;
+    letter-spacing: -0.16px;
+    line-height: 1.15;
+  }
+
+  .btn--lg {
+    padding: 16px 24px;
+    font-size: 15px;
+    letter-spacing: -0.15px;
+    line-height: 1.15;
+  }
+
+  /* ── secondary — outlined, taupe border ──────────────────────────────────── */
+  .btn--secondary {
+    border-color: var(--color-taupe-400);
+    background: transparent;
+    color: var(--color-taupe-400);
+  }
+
+  @media (hover: hover) {
+    .btn--secondary:hover {
+      border-color: var(--color-orange-500);
+      color: var(--color-orange-500);
+    }
+  }
+
+  /* ── primary — solid orange-500 ─────────────────────────────────────────── */
+  .btn--primary {
+    background: var(--color-orange-500);
+    color: var(--color-orange-50);
+  }
+
+  @media (hover: hover) {
+    .btn--primary:hover {
+      background: color-mix(in srgb, var(--color-orange-500) 88%, black);
+    }
+  }
+
+  /* ── primary-dark — solid orange-950 (footer CTA) ───────────────────────── */
+  .btn--primary-dark {
+    background: var(--color-orange-950);
+    color: var(--color-orange-50);
+  }
+
+  @media (hover: hover) {
+    .btn--primary-dark:hover {
+      background: var(--color-orange-50);
+      color: var(--color-orange-950);
+    }
+  }
+
+  /* ── premium — orange→amber gradient with glow ───────────────────────────── */
+  .btn--premium {
+    background: linear-gradient(134.48deg, var(--color-orange-500) 25.47%, #ffb900 94.46%);
+    border-color: var(--color-orange-500);
+    color: var(--color-orange-50);
+    box-shadow: 0 7px 20px 0 rgba(255, 105, 0, 0.45);
+  }
+
+  @media (hover: hover) {
+    .btn--premium:hover {
+      box-shadow: 0 10px 28px 0 rgba(255, 105, 0, 0.65);
+      filter: brightness(1.05);
+    }
+  }
+
+  /* ── Reduced motion ──────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>

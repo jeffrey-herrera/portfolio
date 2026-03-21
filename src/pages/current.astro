@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MainContent from '../components/MainContent.astro';
+import PageTitle from '../components/PageTitle.astro';
+import { inspoImages } from '../data/inspo';
+
+const lastUpdated = 'March 2026';
+---
+
+<Layout
+  title="Current — Jeff Herrera"
+  description="Jeff Herrera's Are.na inspo board — a live feed of current inspiration."
+>
+  <MainContent>
+
+    <PageTitle title='Current' subtitle='A live feed of current inspiration.' />
+
+    <div class="board-grid">
+      {inspoImages.map((img, i) => (
+        <div class="board-card board-card--img">
+          <img
+            src={`/images/inspo/${img.id}.jpg`}
+            alt={img.alt}
+            loading={i < 10 ? 'eager' : 'lazy'}
+            decoding="async"
+            class="board-img"
+            aria-hidden={img.alt ? undefined : 'true'}
+          />
+        </div>
+      ))}
+    </div>
+
+    <p class="now-updated">Last updated {lastUpdated}</p>
+
+  </MainContent>
+</Layout>
+
+<script>
+  function initFadeIn() {
+    document.querySelectorAll<HTMLImageElement>('.board-img').forEach((img) => {
+      if (img.complete) {
+        img.classList.add('is-loaded');
+      } else {
+        img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
+      }
+    });
+  }
+
+  initFadeIn();
+  document.addEventListener('astro:after-swap', initFadeIn);
+</script>
+
+<style>
+  /* ── 5-column image grid ─────────────────────────────────────────────────── */
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: start;
+    gap: 20px;
+    margin-top: 60px;
+  }
+
+  /* ── Image card ──────────────────────────────────────────────────────────── */
+  .board-card--img {
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--color-taupe-300);
+    line-height: 0;
+  }
+
+  .board-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .board-img.is-loaded {
+    opacity: 1;
+  }
+
+
+
+  @media (prefers-reduced-motion: reduce) {
+    .board-img { transition: opacity 0.5s ease; }
+  }
+
+  /* ── Last updated ────────────────────────────────────────────────────────── */
+  .now-updated {
+    font-family: var(--font-uncut);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--color-taupe-400);
+    margin: 40px 0 0;
+  }
+
+  /* ── Mobile ──────────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .board-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 40px;
+    }
+  }
+</style>

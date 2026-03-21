@@ -17,7 +17,11 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Layout title={`${entry.data.title} — Jeff Herrera`} description={entry.data.description}>
+<Layout
+  title={`${entry.data.title} — Jeff Herrera`}
+  description={entry.data.description}
+  ogImage={entry.data.cover}
+>
   <MainContent>
     <div class="page-inner">
 

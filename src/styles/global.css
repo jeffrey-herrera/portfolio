@@ -125,3 +125,19 @@ h1, h2, h3, h4, h5, h6 {
     transition: none;
   }
 }
+
+/* ── Keyboard focus styles ────────────────────────────────────────────────
+   Visible orange ring on keyboard focus only (:focus-visible fires on
+   keyboard / programmatic focus, NOT on mouse click). Each element type
+   gets a border-radius that matches its own shape. */
+:focus-visible {
+  outline: 2.5px solid var(--color-orange-500);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Pill-shaped elements get a fully round outline */
+a[class*="btn"]:focus-visible,
+button[class*="btn"]:focus-visible {
+  border-radius: 999px;
+}

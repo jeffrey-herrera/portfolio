@@ -9,12 +9,21 @@ import Sidebar from '../components/Sidebar.astro';
 interface Props {
   title?: string;
   description?: string;
+  /** Path from root (e.g. /images/work/cover.jpg) or full URL.
+   *  Falls back to the default SEO image when omitted. */
+  ogImage?: string;
 }
 
 const {
   title = 'Jeff Herrera — Creative Director',
   description = 'Jeff Herrera is a Creative Director based in NYC, crafting lasting brands across physical & digital.',
+  ogImage,
 } = Astro.props;
+
+// Resolve to absolute URL: pass-through if already absolute, else prepend origin
+const resolvedOgImage = ogImage
+  ? (ogImage.startsWith('http') ? ogImage : `${Astro.url.origin}${ogImage}`)
+  : `${Astro.url.origin}/images/SEOImage.png`;
 
 const currentPath = Astro.url.pathname;
 ---
@@ -35,15 +44,18 @@ const currentPath = Astro.url.pathname;
     <meta property="og:url" content={Astro.url.href} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={`${Astro.url.origin}/images/SEO%20Image.png`} />
+    <meta property="og:image" content={resolvedOgImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={`${Astro.url.origin}/images/SEO%20Image.png`} />
+    <meta name="twitter:image" content={resolvedOgImage} />
 
   </head>
 
   <body class="overflow-x-hidden">
+    <!-- Skip link: visually hidden, reveals on keyboard focus -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <div class="page-root">
       <div class="page-layout">
         <Sidebar currentPath={currentPath} />
@@ -94,6 +106,28 @@ const currentPath = Astro.url.pathname;
 </script>
 
 <style>
+  /* ── Skip link ────────────────────────────────────────────────────────────
+     Visually hidden until keyboard focus; then slides into view above the page. */
+  .skip-link {
+    position: fixed;
+    top: -100%;
+    left: 20px;
+    z-index: 10000;
+    padding: 10px 20px;
+    background: var(--color-orange-500);
+    color: var(--color-orange-50);
+    font-family: var(--font-uncut);
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 20px;
+  }
+
   .page-root {
     background: var(--color-cream);
     min-height: 100vh;

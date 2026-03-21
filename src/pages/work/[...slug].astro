@@ -19,7 +19,14 @@ const { entry, allWork } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Layout title={`${entry.data.title} — Jeff Herrera`} description={entry.data.description}>
+<!-- Thin reading progress bar pinned to top of viewport -->
+<div class="reading-progress" id="reading-progress" aria-hidden="true"></div>
+
+<Layout
+  title={`${entry.data.title} — Jeff Herrera`}
+  description={entry.data.description}
+  ogImage={entry.data.cover}
+>
   <MainContent>
     <div class="page-inner">
 
@@ -28,7 +35,7 @@ const { Content } = await entry.render();
       <header class="work-header">
         <!-- work-title is intentionally a local <h1> — it uses different sizing
              and spacing from <PageTitle> (48px vs 56px, 60px top padding vs 112px) -->
-        <h1 class="work-title">{entry.data.title}</h1>
+        <h1 class="work-title" transition:name={`work-title-${entry.slug}`}>{entry.data.title}</h1>
 
         {(entry.data.role || entry.data.company || entry.data.year) && (
           <div class="work-meta">
@@ -51,7 +58,7 @@ const { Content } = await entry.render();
 
       {entry.data.cover && (
         <div class="work-cover">
-          <Image src={entry.data.cover} alt={entry.data.title} class="work-cover-img" width={760} height={480} />
+          <Image src={entry.data.cover} alt={entry.data.title} class="work-cover-img" width={760} height={480} transition:name={`work-cover-${entry.slug}`} />
         </div>
       )}
 
@@ -66,6 +73,27 @@ const { Content } = await entry.render();
 </Layout>
 
 <style>
+  /* ── Reading progress bar ───────────────────────────────────────────────── */
+  .reading-progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0%;
+    background: var(--color-orange-500);
+    z-index: 1000;
+    will-change: width;
+    /* Slightly smooth so it doesn't feel jittery on scroll */
+    transition: width 0.08s linear;
+    transform-origin: left center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reading-progress {
+      transition: none;
+    }
+  }
+
   .page-inner {
     padding-top: 40px;
     /* max-width: 760px; */
@@ -152,3 +180,26 @@ const { Content } = await entry.render();
     text-decoration: underline;
   }
 </style>
+
+<script>
+  function initReadingProgress() {
+    const bar = document.getElementById('reading-progress') as HTMLElement | null;
+    if (!bar) return;
+
+    const onScroll = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+      bar.style.width = `${Math.min(100, pct)}%`;
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // set initial value
+
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', onScroll);
+    }, { once: true });
+  }
+
+  initReadingProgress();
+  document.addEventListener('astro:after-swap', initReadingProgress);
+</script>

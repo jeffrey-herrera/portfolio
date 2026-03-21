@@ -79,6 +79,19 @@ const related = scored.map(s => s.entry);
     flex-direction: column;
     gap: 8px;
     text-decoration: none;
+    /* Entrance state — JS adds .is-visible via IntersectionObserver */
+    opacity: 0;
+    transform: translateY(32px);
+    will-change: opacity, transform;
+    transition:
+      opacity   0.65s ease,
+      transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    transition-delay: var(--enter-delay, 0ms);
+  }
+
+  .related-card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .related-image {
@@ -94,6 +107,9 @@ const related = scored.map(s => s.entry);
     height: 100%;
     object-fit: cover;
     display: block;
+    /* Match index.astro: slight zoom-in base so hover scale feels natural */
+    scale: 1.08;
+    will-change: translate, scale;
     transition: scale 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -135,12 +151,18 @@ const related = scored.map(s => s.entry);
   }
 
   @media (hover: hover) {
-    .related-card:hover .related-img { scale: 1.06; }
+    .related-card:hover .related-img { scale: 1.13; }
     .related-card:hover .related-image::after { opacity: 0.2; }
     .related-card:hover .related-title { color: var(--color-orange-500); }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .related-card {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
     .related-img {
       transition: none;
     }
@@ -153,3 +175,27 @@ const related = scored.map(s => s.entry);
     }
   }
 </style>
+
+<script>
+  function initRelatedCards() {
+    const cards = document.querySelectorAll<HTMLElement>('.related-card');
+    if (!cards.length) return;
+
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el  = entry.target as HTMLElement;
+        const idx = Array.from(cards).indexOf(el);
+        el.style.setProperty('--enter-delay', `${idx * 80}ms`);
+        el.classList.add('is-visible');
+        io.unobserve(el);
+      });
+    }, { threshold: 0.08 });
+
+    cards.forEach(card => io.observe(card));
+    document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
+  }
+
+  initRelatedCards();
+  document.addEventListener('astro:after-swap', initRelatedCards);
+</script>

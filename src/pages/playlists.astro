@@ -2,67 +2,931 @@
 import Layout from '../layouts/Layout.astro';
 import MainContent from '../components/MainContent.astro';
 import PageTitle from '../components/PageTitle.astro';
+import Button from '../components/Button.astro';
+import { playlists } from '../data/playlists.ts';
+import { getSeason } from '../utils/seasons.ts';
+
+// Group by year, descending
+const byYear = playlists.reduce(
+  (acc, p) => { (acc[p.year] ??= []).push(p); return acc; },
+  {} as Record<number, typeof playlists>
+);
+const years = Object.keys(byYear).map(Number).sort((a, b) => b - a);
 ---
 
-<Layout title="Playlists — Jeff Herrera" description="My sound index — let's jam.">
+<Layout title="Playlists — Jeff Herrera" description="A monthly soundtrack, from 2020 to now.">
+
+  <!-- Platform glow overlays — cross-faded by JS on platform toggle -->
+  <div class="platform-glow platform-glow--spotify" id="glow-spotify" aria-hidden="true"></div>
+  <div class="platform-glow platform-glow--apple"   id="glow-apple"   aria-hidden="true"></div>
+
   <MainContent>
-    <div class="page-inner">
 
-      <PageTitle title="Playlists" subtitle="My sound index — let's jam." />
+    <PageTitle title="Playlists" subtitle="A monthly soundtrack." />
 
-      <div class="playlists">
-        <!-- Add playlist embeds or cards here -->
-        <article class="playlist-card">
-          <h2 class="playlist-name">Example Playlist</h2>
-          <p class="playlist-desc">
-            Add your playlists here — embed Spotify, YouTube, or create custom collections.
-          </p>
-        </article>
+    <!-- ── Filter bar ──────────────────────────────────────────────────────── -->
+    <div class="filter-bar" id="filter-bar" data-platform="spotify">
+
+      <!-- Platform toggle -->
+      <div class="platform-toggle" role="group" aria-label="Platform">
+        <button class="platform-btn platform-btn--active" data-platform="spotify" type="button">
+          Spotify
+        </button>
+        <button class="platform-btn" data-platform="apple" type="button">
+          Apple Music
+        </button>
       </div>
 
+      <div class="filter-divider" aria-hidden="true"></div>
+
+      <!-- Year dropdown -->
+      <div class="filter-drop" id="drop-year">
+        <button class="filter-drop-btn" type="button" aria-expanded="false" aria-haspopup="listbox">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          <span class="filter-drop-label">All Years</span>
+          <svg class="filter-drop-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <ul class="filter-drop-panel" role="listbox" aria-label="Filter by year">
+          <li class="filter-drop-opt is-selected" role="option" aria-selected="true" data-value="">All Years</li>
+          {years.map(y => (
+            <li class="filter-drop-opt" role="option" aria-selected="false" data-value={String(y)}>{y}</li>
+          ))}
+        </ul>
+      </div>
+
+      <!-- Season dropdown -->
+      <div class="filter-drop" id="drop-season">
+        <button class="filter-drop-btn" type="button" aria-expanded="false" aria-haspopup="listbox">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          <span class="filter-drop-label">All Seasons</span>
+          <svg class="filter-drop-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <ul class="filter-drop-panel" role="listbox" aria-label="Filter by season">
+          <li class="filter-drop-opt is-selected" role="option" aria-selected="true" data-value="">All Seasons</li>
+          <li class="filter-drop-opt" role="option" aria-selected="false" data-value="spring">Spring</li>
+          <li class="filter-drop-opt" role="option" aria-selected="false" data-value="summer">Summer</li>
+          <li class="filter-drop-opt" role="option" aria-selected="false" data-value="fall">Fall</li>
+          <li class="filter-drop-opt" role="option" aria-selected="false" data-value="winter">Winter</li>
+        </ul>
+      </div>
+
+      <!-- Feeling Lucky -->
+      <Button variant="premium" size="sm" id="lucky-btn" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="8.5"  cy="8.5"  r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="15.5" cy="8.5"  r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="15.5" cy="15.5" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="8.5"  cy="15.5" r="1.5" fill="currentColor" stroke="none"/>
+          <circle cx="12"   cy="12"   r="1.5" fill="currentColor" stroke="none"/>
+        </svg>
+        Feeling Lucky?
+      </Button>
+
     </div>
+
+    <!-- ── Year-grouped cards ──────────────────────────────────────────────── -->
+    <div class="years-list" id="years-list">
+      {years.map((year) => (
+        <section
+          class="year-card"
+          data-year={year}
+          id={`year-${year}`}
+        >
+          <span class="year-heading" aria-hidden="true">{year}</span>
+
+          <div class="playlist-grid">
+            {byYear[year].map((playlist) => {
+              const season  = getSeason(playlist.month);
+              const seasons = byYear[year].length === 1
+                ? 'spring summer fall winter'
+                : (season ?? 'spring summer fall winter');
+
+              return (
+                <a
+                  class="playlist-card"
+                  href={playlist.spotifyUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-season={seasons}
+                  data-spotify={playlist.spotifyUrl}
+                  data-apple={playlist.appleMusicUrl}
+                  data-name={playlist.name}
+                  aria-label={`Listen to ${playlist.name} on Spotify`}
+                >
+                  <div class="card-cover" data-cursor-label="Listen">
+                    <div class="card-shimmer" aria-hidden="true"></div>
+                    <img
+                      src={playlist.coverUrl}
+                      alt={playlist.name}
+                      width="400"
+                      height="400"
+                      loading="lazy"
+                      decoding="async"
+                      class="card-img"
+                    />
+                  </div>
+                  <div class="card-text">
+                    <span class="card-name">{playlist.name}</span>
+                    {playlist.featuredTrack && (
+                      <span class="card-track">{playlist.featuredTrack}</span>
+                    )}
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- Empty state -->
+    <p class="no-results" id="no-results" aria-live="polite" hidden>
+      No playlists match those filters.
+    </p>
+
   </MainContent>
 </Layout>
 
+<script>
+  import type { Platform } from '../data/playlists.ts';
+
+  // ── State ────────────────────────────────────────────────────────────────
+  let currentPlatform: Platform = 'spotify';
+  let currentYear   = '';
+  let currentSeason = '';
+
+  // ─── Custom dropdown logic ────────────────────────────────────────────────
+  function initDropdown(
+    dropEl: HTMLElement,
+    onChange: (value: string, label: string) => void
+  ) {
+    const btn    = dropEl.querySelector<HTMLButtonElement>('.filter-drop-btn')!;
+    const panel  = dropEl.querySelector<HTMLElement>('.filter-drop-panel')!;
+    const labelEl = dropEl.querySelector<HTMLElement>('.filter-drop-label')!;
+    const opts   = Array.from(dropEl.querySelectorAll<HTMLElement>('.filter-drop-opt'));
+
+    let focusIdx = 0;
+
+    const open = () => {
+      btn.setAttribute('aria-expanded', 'true');
+      panel.classList.add('is-open');
+      // Focus the selected option
+      const selectedIdx = opts.findIndex(o => o.classList.contains('is-selected'));
+      focusIdx = selectedIdx >= 0 ? selectedIdx : 0;
+      opts[focusIdx]?.focus();
+    };
+
+    // returnFocus: true when closed via keyboard so focus goes back to trigger btn;
+    // false when closed by clicking outside so we don't steal focus / scroll the page.
+    const close = (returnFocus = true) => {
+      btn.setAttribute('aria-expanded', 'false');
+      panel.classList.remove('is-open');
+      if (returnFocus) btn.focus();
+    };
+
+    const select = (opt: HTMLElement) => {
+      opts.forEach(o => { o.classList.remove('is-selected'); o.setAttribute('aria-selected', 'false'); });
+      opt.classList.add('is-selected');
+      opt.setAttribute('aria-selected', 'true');
+      labelEl.textContent = opt.textContent?.trim() ?? '';
+      const value = opt.dataset.value ?? '';
+      // Mark button as actively filtering (non-default selection)
+      btn.classList.toggle('is-active', value !== '');
+      onChange(value, opt.textContent?.trim() ?? '');
+      // If selected via mouse click, don't steal focus back to the button
+      close(document.activeElement !== document.body && dropEl.contains(document.activeElement));
+    };
+
+    btn.addEventListener('click', () => {
+      btn.getAttribute('aria-expanded') === 'true' ? close(false) : open();
+    });
+
+    opts.forEach((opt, i) => {
+      opt.setAttribute('tabindex', '-1');
+      opt.addEventListener('click', () => select(opt));
+      opt.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(opt); }
+        if (e.key === 'ArrowDown') { e.preventDefault(); focusIdx = Math.min(i + 1, opts.length - 1); opts[focusIdx].focus(); }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); focusIdx = Math.max(i - 1, 0); opts[focusIdx].focus(); }
+        if (e.key === 'Escape')    { close(true); }
+      });
+    });
+
+    btn.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close(true);
+    });
+
+    // Click outside — close without returning focus so we don't jump the scroll position
+    const onOutside = (e: MouseEvent) => {
+      if (!dropEl.contains(e.target as Node)) close(false);
+    };
+    document.addEventListener('click', onOutside);
+    document.addEventListener('astro:before-swap', () => {
+      document.removeEventListener('click', onOutside);
+    }, { once: true });
+  }
+
+  // ── Filter application ───────────────────────────────────────────────────
+  function applyFilters(
+    yearCards: NodeListOf<HTMLElement>,
+    playlistCards: NodeListOf<HTMLAnchorElement>,
+    noResults: HTMLElement | null,
+  ) {
+    let anyVisible = false;
+
+    yearCards.forEach(card => {
+      const yearMatch = !currentYear || card.dataset.year === currentYear;
+      if (!yearMatch) { card.hidden = true; return; }
+
+      const cards = card.querySelectorAll<HTMLAnchorElement>('.playlist-card');
+      let yearHasVisible = false;
+      cards.forEach(pCard => {
+        const seasons = pCard.dataset.season ?? '';
+        const seasonMatch = !currentSeason || seasons.includes(currentSeason);
+        pCard.hidden = !seasonMatch;
+        if (seasonMatch) yearHasVisible = true;
+      });
+
+      card.hidden = !yearHasVisible;
+      if (yearHasVisible) anyVisible = true;
+    });
+
+    if (noResults) noResults.hidden = anyVisible;
+  }
+
+  async function applyFiltersAnimated(
+    yearCards: NodeListOf<HTMLElement>,
+    playlistCards: NodeListOf<HTMLAnchorElement>,
+    noResults: HTMLElement | null,
+  ) {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedMotion) { applyFilters(yearCards, playlistCards, noResults); return; }
+
+    const allCards = Array.from(playlistCards);
+
+    // Reset any in-flight animation state
+    allCards.forEach(c => {
+      c.classList.remove('is-filtering-out', 'is-filtering-in');
+      c.style.animationDelay = '';
+    });
+
+    // Fade out currently visible cards
+    const wasVisible = allCards.filter(c => !c.hidden && !c.closest('[hidden]'));
+    wasVisible.forEach(c => c.classList.add('is-filtering-out'));
+
+    await new Promise<void>(r => setTimeout(r, 160));
+
+    // Apply filter (sets hidden on cards and year sections)
+    applyFilters(yearCards, playlistCards, noResults);
+
+    // Animate in newly visible cards
+    const nowVisible = allCards.filter(c => !c.hidden && !c.closest('[hidden]'));
+    nowVisible.forEach((c, i) => {
+      c.classList.remove('is-filtering-out');
+      c.style.animationDelay = `${Math.min(i * 18, 200)}ms`;
+      c.classList.add('is-filtering-in');
+    });
+
+    // Clean up animation classes after they've all finished
+    setTimeout(() => {
+      nowVisible.forEach(c => {
+        c.classList.remove('is-filtering-in');
+        c.style.animationDelay = '';
+      });
+    }, 700);
+  }
+
+  // ── Holographic card effect ───────────────────────────────────────────────
+  function initHolographic() {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const cards = document.querySelectorAll<HTMLAnchorElement>('.playlist-card');
+    const cleanups: Array<() => void> = [];
+
+    cards.forEach(card => {
+      const cover = card.querySelector<HTMLElement>('.card-cover');
+      if (!cover) return;
+
+      let rafId = 0;
+      let targetRX = 0, targetRY = 0;
+      let currentRX = 0, currentRY = 0;
+      let isHovering = false;
+      const LERP = 0.1;
+      const MAX_TILT = 12;
+
+      const tick = () => {
+        currentRX += (targetRX - currentRX) * LERP;
+        currentRY += (targetRY - currentRY) * LERP;
+
+        if (!reducedMotion) {
+          // Shadow offset moves opposite to tilt direction, with a base downward offset
+          // to simulate light coming from above
+          const shadowX    = -currentRY * 1.4;
+          const shadowY    =  currentRX * 1.4 + 14;
+          const shadowBlur =  28;
+          const shadowOpacity = isHovering
+            ? 0.28
+            : Math.max(0, (Math.abs(currentRX) + Math.abs(currentRY)) / (MAX_TILT * 2)) * 0.28;
+
+          cover.style.transform = `perspective(700px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) scale3d(1.02,1.02,1.02)`;
+          cover.style.filter    = `drop-shadow(${shadowX}px ${shadowY}px ${shadowBlur}px rgba(68,19,6,${shadowOpacity}))`;
+        }
+
+        if (
+          isHovering ||
+          Math.abs(currentRX - targetRX) > 0.05 ||
+          Math.abs(currentRY - targetRY) > 0.05
+        ) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          cover.style.transform = '';
+          cover.style.filter    = '';
+          cover.style.removeProperty('--mx');
+          cover.style.removeProperty('--my');
+          cover.style.removeProperty('--holo-angle');
+        }
+      };
+
+      const onMove = (e: PointerEvent) => {
+        const rect = cover.getBoundingClientRect();
+        const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        const y = Math.max(0, Math.min(1, (e.clientY - rect.top)  / rect.height));
+
+        targetRY =  (x - 0.5) * MAX_TILT * 2;
+        targetRX = -(y - 0.5) * MAX_TILT * 2;
+
+        const angle = Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI) + 90;
+        cover.style.setProperty('--mx',         `${x * 100}%`);
+        cover.style.setProperty('--my',         `${y * 100}%`);
+        cover.style.setProperty('--holo-angle', `${angle}deg`);
+      };
+
+      const onEnter = () => {
+        isHovering = true;
+        cover.classList.add('is-holo');
+        cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(tick);
+      };
+
+      const onLeave = () => {
+        isHovering = false;
+        targetRX = 0;
+        targetRY = 0;
+        cover.classList.remove('is-holo');
+        rafId = requestAnimationFrame(tick);
+      };
+
+      card.addEventListener('pointerenter', onEnter);
+      card.addEventListener('pointermove',  onMove);
+      card.addEventListener('pointerleave', onLeave);
+
+      cleanups.push(() => {
+        cancelAnimationFrame(rafId);
+        card.removeEventListener('pointerenter', onEnter);
+        card.removeEventListener('pointermove',  onMove);
+        card.removeEventListener('pointerleave', onLeave);
+        cover.style.transform = '';
+        cover.style.filter    = '';
+      });
+    });
+
+    document.addEventListener('astro:before-swap', () => {
+      cleanups.forEach(fn => fn());
+    }, { once: true });
+  }
+
+  // ── Main init ────────────────────────────────────────────────────────────
+  function init() {
+    const platformBtns  = document.querySelectorAll<HTMLButtonElement>('.platform-btn');
+    const yearDropEl    = document.getElementById('drop-year')    as HTMLElement | null;
+    const seasonDropEl  = document.getElementById('drop-season')  as HTMLElement | null;
+    const luckyBtn      = document.getElementById('lucky-btn')    as HTMLButtonElement | null;
+    const yearCards     = document.querySelectorAll<HTMLElement>('.year-card');
+    const playlistCards = document.querySelectorAll<HTMLAnchorElement>('.playlist-card');
+    const noResults     = document.getElementById('no-results')   as HTMLElement | null;
+
+    // Reset state
+    currentPlatform = 'spotify';
+    currentYear     = '';
+    currentSeason   = '';
+
+    // Platform glow
+    const glowSpotify    = document.getElementById('glow-spotify');
+    const glowApple      = document.getElementById('glow-apple');
+    const filterBar  = document.getElementById('filter-bar');
+    const updateGlow = () => {
+      if (!glowSpotify || !glowApple) return;
+      glowSpotify.style.opacity = currentPlatform === 'spotify' ? '1' : '0';
+      glowApple.style.opacity   = currentPlatform === 'apple'   ? '1' : '0';
+      if (filterBar) filterBar.dataset.platform = currentPlatform;
+    };
+    updateGlow();
+
+    // Platform toggle
+    platformBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentPlatform = btn.dataset.platform as Platform;
+        platformBtns.forEach(b => b.classList.toggle('platform-btn--active', b === btn));
+        updateGlow();
+        playlistCards.forEach(card => {
+          const url = currentPlatform === 'apple'
+            ? card.dataset.apple || ''
+            : card.dataset.spotify || '';
+          card.href = url || '#';
+          card.setAttribute('aria-disabled', url ? 'false' : 'true');
+          card.setAttribute('aria-label',
+            `Listen to ${card.dataset.name} on ${currentPlatform === 'apple' ? 'Apple Music' : 'Spotify'}`
+          );
+          card.classList.toggle('card--no-url', !url);
+        });
+      });
+    });
+
+    // Year dropdown
+    if (yearDropEl) {
+      initDropdown(yearDropEl, (value) => {
+        currentYear = value;
+        applyFiltersAnimated(yearCards, playlistCards, noResults);
+      });
+    }
+
+    // Season dropdown
+    if (seasonDropEl) {
+      initDropdown(seasonDropEl, (value) => {
+        currentSeason = value;
+        applyFiltersAnimated(yearCards, playlistCards, noResults);
+      });
+    }
+
+    // Feeling Lucky
+    luckyBtn?.addEventListener('click', () => {
+      const visible = Array.from(playlistCards).filter(card => {
+        const hidden = card.closest('.year-card')?.hasAttribute('hidden') || card.hasAttribute('hidden');
+        const url = currentPlatform === 'apple' ? card.dataset.apple : card.dataset.spotify;
+        return !hidden && url;
+      });
+      if (!visible.length) return;
+      const lucky = visible[Math.floor(Math.random() * visible.length)];
+      const url = currentPlatform === 'apple' ? lucky.dataset.apple! : lucky.dataset.spotify!;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    });
+
+    initHolographic();
+    initSkeletons();
+  }
+
+  // ── Skeleton shimmer ──────────────────────────────────────────────────────
+  function initSkeletons() {
+    document.querySelectorAll<HTMLElement>('.card-img').forEach(img => {
+      const cover = img.closest<HTMLElement>('.card-cover');
+      if (!cover) return;
+      const onLoaded = () => cover.classList.add('img-loaded');
+      if ((img as HTMLImageElement).complete && (img as HTMLImageElement).naturalWidth > 0) {
+        onLoaded();
+      } else {
+        img.addEventListener('load', onLoaded, { once: true });
+      }
+    });
+  }
+
+  init();
+  document.addEventListener('astro:after-swap', init);
+</script>
+
 <style>
-  .page-inner {
-    max-width: 700px;
+
+  /* ── Platform glow overlays ──────────────────────────────────────────────── */
+  .platform-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+    transition: opacity 1s ease;
   }
 
-  .page-intro {
-    font-family: var(--font-fragment);
-    font-size: 20px;
-    line-height: 1.35;
-    letter-spacing: -0.4px;
-    color: var(--color-taupe-400);
-    margin: 0 0 48px;
+  .platform-glow--spotify {
+    box-shadow:
+      inset 0 0  30px rgba(30, 215, 96, 0.75),
+      inset 0 0  5px rgba(30, 215, 96, 0.9);
+    opacity: 1;
   }
 
-  .playlists {
+  .platform-glow--apple {
+    box-shadow:
+      inset 0 0  30px rgba(252, 60, 68, 0.75),
+      inset 0 0  5px rgba(252, 60, 68, 0.9);
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .platform-glow { transition: none; }
+  }
+
+  /* ── Filter bar ───────────────────────────────────────────────────────────── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  /* Platform toggle */
+  .platform-toggle {
+    display: flex;
+    align-items: center;
+    background: var(--color-orange-50);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .platform-btn {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 999px;
+    font-family: var(--font-uncut);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.16px;
+    border: none;
+    background: transparent;
+    color: var(--color-orange-950);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .platform-btn--active {
+    background: var(--color-orange-500);
+    color: var(--color-orange-50);
+  }
+
+  #filter-bar[data-platform="spotify"] .platform-btn--active {
+    background: rgb(30, 215, 96);
+    color: #0a2e17;
+  }
+
+  #filter-bar[data-platform="apple"] .platform-btn--active {
+    background: rgb(252, 60, 68);
+    color: #fff;
+  }
+
+  /* Divider */
+  .filter-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--color-taupe-300);
+    flex-shrink: 0;
+  }
+
+  /* ── Custom dropdown ──────────────────────────────────────────────────────── */
+  .filter-drop {
+    position: relative;
+  }
+
+  .filter-drop-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    background: var(--color-orange-50);
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-family: var(--font-uncut);
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.16px;
+    color: var(--color-orange-950);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .filter-drop-btn:hover {
+    border-color: var(--color-taupe-300);
+  }
+
+  .filter-drop-btn.is-active {
+    color: var(--color-orange-500);
+    border-color: var(--color-orange-500);
+  }
+
+  .filter-drop-btn[aria-expanded="true"] {
+    border-color: var(--color-orange-500);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .filter-drop-chevron {
+    transition: transform 0.2s ease;
+    opacity: 0.6;
+  }
+
+  .filter-drop-btn[aria-expanded="true"] .filter-drop-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Panel */
+  .filter-drop-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% - 1px);
+    left: 0;
+    min-width: 100%;
+    background: var(--color-orange-50);
+    border: 1px solid var(--color-orange-500);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    list-style: none;
+    margin: 0;
+    padding: 6px 0 8px;
+    z-index: 100;
+    overflow: hidden;
+  }
+
+  .filter-drop-panel.is-open {
+    display: block;
+  }
+
+  .filter-drop-opt {
+    padding: 8px 16px;
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: -0.15px;
+    color: var(--color-orange-950);
+    cursor: pointer;
+    outline: none;
+    transition: color 0.12s ease;
+  }
+
+  .filter-drop-opt:hover,
+  .filter-drop-opt:focus {
+    color: var(--color-orange-500);
+  }
+
+  .filter-drop-opt.is-selected {
+    color: var(--color-orange-500);
+  }
+
+  /* ── Year sections ────────────────────────────────────────────────────────── */
+  .years-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
   }
 
+  .year-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px 20px 30px;
+    scroll-margin-top: 80px;
+  }
+
+  .year-heading {
+    display: block;
+    font-family: var(--font-uncut);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.96px;
+    color: var(--color-taupe-300);
+    line-height: 1;
+    margin-bottom: 20px;
+    font-feature-settings: 'dlig' 1;
+  }
+
+  /* ── Playlist grid ────────────────────────────────────────────────────────── */
+  .playlist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  @media (min-width: 2000px) {
+    .playlist-grid {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+
+  /* ── Playlist card ────────────────────────────────────────────────────────── */
   .playlist-card {
-    background: var(--color-white);
-    border-radius: 6px;
-    padding: 24px;
+    display: block;
+    text-decoration: none;
+    min-width: 0; /* prevent grid item expanding beyond its 1fr track */
   }
 
-  .playlist-name {
-    font-family: var(--font-fragment);
-    font-size: 20px;
-    letter-spacing: -0.4px;
+  /* Filter animations */
+  .playlist-card.is-filtering-out {
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+  }
+
+  .playlist-card.is-filtering-in {
+    animation: filterFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes filterFadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  }
+
+  .playlist-card[hidden] { display: none; }
+
+  .card--no-url {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ── Cover: square 1:1, hosts holo pseudo-elements ───────────────────────── */
+  .card-cover {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 12px;
+    will-change: transform;
+    transform-origin: center center;
+    transform-style: preserve-3d;
+  }
+
+  .card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Shimmer skeleton ─────────────────────────────────────────────────────── */
+  .card-shimmer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(
+      90deg,
+      var(--color-taupe-300) 25%,
+      var(--color-cream) 50%,
+      var(--color-taupe-300) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  .card-cover.img-loaded .card-shimmer {
+    display: none;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ── Text below cover ─────────────────────────────────────────────────────── */
+  .card-text {
+    padding: 10px 2px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .card-name {
+    font-family: var(--font-uncut);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.12px;
     color: var(--color-orange-950);
-    margin: 0 0 8px;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .playlist-desc {
+  .card-track {
+    font-family: var(--font-uncut);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: -0.08px;
+    color: var(--color-taupe-400);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Holographic overlay (on cover only) ─────────────────────────────────── */
+
+  /* Rainbow foil — rotates hue based on mouse angle */
+  .card-cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: linear-gradient(
+      var(--holo-angle, 120deg),
+      hsl(  0 100% 60% / 0.35)  0%,
+      hsl( 55 100% 55% / 0.35) 16%,
+      hsl(110 100% 55% / 0.35) 33%,
+      hsl(180 100% 55% / 0.35) 50%,
+      hsl(240 100% 55% / 0.35) 66%,
+      hsl(300 100% 55% / 0.35) 83%,
+      hsl(360 100% 60% / 0.35)100%
+    );
+    filter: blur(25px);
+    mix-blend-mode: color-dodge;
+  }
+
+  /* Specular radial highlight — follows mouse position */
+  .card-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      ellipse 80% 70% at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.12) 35%,
+      transparent 70%
+    );
+    mix-blend-mode: overlay;
+  }
+
+  .card-cover.is-holo::before,
+  .card-cover.is-holo::after {
+    opacity: 1;
+  }
+
+  /* ── Empty state ──────────────────────────────────────────────────────────── */
+  .no-results {
     font-family: var(--font-uncut);
     font-size: 14px;
-    line-height: 1.5;
     color: var(--color-taupe-400);
+    text-align: center;
+    padding: 60px 0;
     margin: 0;
   }
+
+  /* ── Reduced motion ───────────────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .platform-btn,
+    .filter-drop-btn,
+    .filter-drop-chevron,
+    .card-cover::before,
+    .card-cover::after { transition: none; }
+    .card-shimmer { animation: none; }
+    .playlist-card.is-filtering-in { animation: none; }
+    .playlist-card.is-filtering-out { transition: none; }
+  }
+
+  /* ── Mobile ───────────────────────────────────────────────────────────────── */
+  @media (max-width: 1023px) {
+    .filter-bar {
+      gap: 10px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+
+    .filter-divider { display: none; }
+
+    .playlist-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .years-list { gap: 16px; }
+
+    .year-card { padding: 16px; }
+    .year-heading { font-size: 24px; margin-bottom: 14px; }
+  }
+
+  /* Very small screens: platform toggle and lucky button go full width */
+  @media (max-width: 479px) {
+    .platform-toggle {
+      width: 100%;
+      justify-content: stretch;
+    }
+
+    .platform-btn {
+      flex: 1;
+      justify-content: center;
+    }
+
+    :global(#lucky-btn) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
 </style>

@@ -20,7 +20,15 @@ const socialLinks = [
   { href: 'mailto:hello@jeffherrera.com', label: 'Email', external: false },
 ];
 
-const isHome = currentPath === '/';
+const isHome      = currentPath === '/';
+const isAbout     = currentPath === '/about';
+const isPlaylists = currentPath === '/playlists';
+
+// Years present in the playlists data — used for sidebar nav
+import { playlists } from '../data/playlists.ts';
+const playlistYears = isPlaylists
+  ? [...new Set(playlists.map(p => p.year))].sort((a, b) => b - a)
+  : [];
 ---
 
 <!-- ─── Desktop sidebar ────────────────────────────────────────────────────── -->
@@ -66,6 +74,35 @@ const isHome = currentPath === '/';
       </div>
     </div>
   </div>
+
+  {isAbout && (
+    <div class="sidebar-item">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Current</span>
+        <div class="sidebar-links">
+          <a href="/current" class="sidebar-link sidebar-link--cta">
+            What's inspiring me
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {isPlaylists && (
+    <div class="sidebar-item sidebar-year-nav" id="sidebar-year-nav">
+      <div class="sidebar-section">
+        <span class="sidebar-label">Years</span>
+        <div class="sidebar-links">
+          {playlistYears.map(year => (
+            <a href={`#year-${year}`} class="sidebar-link sidebar-year-link" data-year={year}>
+              {year}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  )}
 
   {isHome && (
     <!-- Selected Work sub-nav: starts hidden, fades in when user scrolls into the work section -->
@@ -190,7 +227,7 @@ const isHome = currentPath === '/';
 
   /* The dot lives entirely on the link via ::before — no separate element needed */
   .nav-link {
-    display: block;
+    display: inline-block;
     position: relative;
     font-family: var(--font-uncut);
     font-size: 16px;
@@ -238,6 +275,7 @@ const isHome = currentPath === '/';
     display: flex;
     gap: 8px;
     flex-direction: column;
+    align-items: flex-start;
     font-family: var(--font-uncut);
     font-size: 15px;
     font-weight: 500;
@@ -252,8 +290,17 @@ const isHome = currentPath === '/';
     transition: color 0.15s;
   }
 
-  .sidebar-link:hover   { color: var(--color-orange-500); }
+  .sidebar-link:hover    { color: var(--color-orange-500); }
   .sidebar-link.is-active { color: var(--color-orange-500); }
+
+  .sidebar-link--cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Year nav: always visible on /playlists, active link tracks scroll */
+  .sidebar-year-link.is-active { color: var(--color-orange-500); }
 
   /* Selected Work sub-nav: hidden by default, JS adds .visible on scroll */
   .sidebar-work-nav {
@@ -535,14 +582,47 @@ const isHome = currentPath === '/';
 
     if (!header || !menuBtn || !menu) return;
 
+    // ── Focus trap ─────────────────────────────────────────────────────────
+    // When the overlay is open, Tab cycles within the menu; Escape closes it.
+    const trapFocus = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeMenu();
+        return;
+      }
+
+      if (e.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        menu.querySelectorAll<HTMLElement>('a, button')
+      ).filter(el => !el.hasAttribute('inert'));
+
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
+    };
+
     const openMenu = () => {
       menu.classList.add('is-open');
       header.classList.add('menu-is-open');
       menuBtn.setAttribute('aria-expanded', 'true');
       menuBtn.setAttribute('aria-label', 'Close menu');
       menu.setAttribute('aria-hidden', 'false');
+      menu.removeAttribute('inert');
       document.body.style.overflow = 'hidden';
       document.documentElement.classList.add('menu-open');
+      menu.addEventListener('keydown', trapFocus);
+      // Move focus into the first nav link after the clip-path starts expanding
+      requestAnimationFrame(() => {
+        menu.querySelector<HTMLElement>('.mobile-nav-link')?.focus();
+      });
     };
 
     const closeMenu = (callback?: () => void) => {
@@ -551,10 +631,17 @@ const isHome = currentPath === '/';
       menuBtn.setAttribute('aria-expanded', 'false');
       menuBtn.setAttribute('aria-label', 'Open menu');
       menu.setAttribute('aria-hidden', 'true');
+      menu.setAttribute('inert', '');
       document.body.style.overflow = '';
       document.documentElement.classList.remove('menu-open');
+      menu.removeEventListener('keydown', trapFocus);
+      // Return focus to the toggle button immediately
+      if (!callback) menuBtn.focus();
       if (callback) setTimeout(callback, 900); // matches clip-path transition
     };
+
+    // Initialise closed state — prevents keyboard from reaching hidden items
+    menu.setAttribute('inert', '');
 
     const onBtnClick = () => {
       menuBtn.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu();
@@ -579,6 +666,7 @@ const isHome = currentPath === '/';
     const cleanup = () => {
       document.body.style.overflow = '';
       document.documentElement.classList.remove('menu-open');
+      menu.removeEventListener('keydown', trapFocus);
       menuBtn.removeEventListener('click', onBtnClick);
       linkHandlers.forEach(fn => fn());
     };
@@ -586,10 +674,75 @@ const isHome = currentPath === '/';
     document.addEventListener('astro:before-swap', cleanup, { once: true });
   }
 
+  // ─── Selected Work nav smooth scroll ──────────────────────────────────────
+  function initWorkNav() {
+    const links = document.querySelectorAll<HTMLAnchorElement>('.sidebar-work-nav .sidebar-link');
+    if (!links.length) return;
+
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        // Only intercept if we're already on the home page
+        const hash = link.getAttribute('href')?.split('#')[1];
+        if (!hash) return;
+        const target = document.getElementById(hash);
+        if (!target) return;
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  // ─── Playlist year nav scroll tracking ────────────────────────────────────
+  function initYearNav() {
+    const links = document.querySelectorAll<HTMLAnchorElement>('.sidebar-year-link');
+    if (!links.length) return;
+
+    // Smooth-scroll via Lenis on anchor click
+    links.forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const targetId = link.getAttribute('href')?.slice(1);
+        const target   = targetId ? document.getElementById(targetId) : null;
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Track which year section is in view
+    const sections = Array.from(links)
+      .map(link => {
+        const id = link.getAttribute('href')?.slice(1);
+        return id ? document.getElementById(id) : null;
+      })
+      .filter(Boolean) as HTMLElement[];
+
+    const setActive = () => {
+      const scrollY = window.scrollY + 160; // offset for sticky header
+      let active: string | null = null;
+
+      sections.forEach(section => {
+        if (section.offsetTop <= scrollY) active = section.id;
+      });
+
+      links.forEach(link => {
+        const matches = active && link.getAttribute('href') === `#${active}`;
+        link.classList.toggle('is-active', !!matches);
+      });
+    };
+
+    window.addEventListener('scroll', setActive, { passive: true });
+    setActive();
+
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', setActive);
+    }, { once: true });
+  }
+
   // ─── Init ─────────────────────────────────────────────────────────────────
   function initAll() {
     initBackToTop();
     initMobileMenu();
+    initWorkNav();
+    initYearNav();
   }
 
   initAll();

@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import MainContent from '../components/MainContent.astro';
+import Button from '../components/Button.astro';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 
@@ -20,6 +21,9 @@ const categories = [
 <Layout>
   <MainContent>
     <div class="hero row">
+    <!-- Canvas for velocity-based cursor trail — sits behind hero text -->
+    <canvas class="hero-trail-canvas" aria-hidden="true"></canvas>
+
     <!-- Hero text — each word wrapped in .word-clip for clip-mask entrance  -->
     <div class="hero-text">
       <span class="word-clip" style="--i:0"><span class="word word--sans word--orange">I'M</span></span>
@@ -74,9 +78,9 @@ const categories = [
         <p class="about-text">
           Currently Associate Creative Director of Brand &amp; Experiential / Competitive Cold Brew Drinker at Braze
         </p>
-        <a href="/about" class="about-btn">
+        <Button href="/about" variant="secondary" class="about-btn">
           About <span>→</span>
-        </a>
+        </Button>
       </div>
     </div>
 
@@ -104,12 +108,12 @@ const categories = [
                   <div class="project-card project-card--large">
                     <div class="project-image project-image--wide">
                       {category.items[0].data.cover
-                        ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" />
+                        ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" transition:name={`work-cover-${category.items[0].slug}`} />
                         : <div class="project-placeholder"></div>
                       }
                     </div>
                     <div class="project-info">
-                      <span class="project-title">{category.items[0].data.title}</span>
+                      <span class="project-title" transition:name={`work-title-${category.items[0].slug}`}>{category.items[0].data.title}</span>
                       <span class="project-cat">{category.name}</span>
                     </div>
                   </div>
@@ -130,12 +134,12 @@ const categories = [
                           <div class="project-card">
                             <div class="project-image project-image--square">
                               {item.data.cover
-                                ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} />
+                                ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} transition:name={`work-cover-${item.slug}`} />
                                 : <div class="project-placeholder"></div>
                               }
                             </div>
                             <div class="project-info">
-                              <span class="project-title">{item.data.title}</span>
+                              <span class="project-title" transition:name={`work-title-${item.slug}`}>{item.data.title}</span>
                               <span class="project-cat">{item.data.tags[0]}</span>
                             </div>
                           </div>
@@ -156,6 +160,8 @@ const categories = [
 </Layout>
 
 <script>
+  import { initMagnetic } from '../utils/magnetic.ts';
+
   // ── Work nav + back-to-top scroll reveal ─────────────────────────────────
   function initWorkNavScroll() {
     const workSections = document.querySelector('.work-sections') as HTMLElement | null;
@@ -276,48 +282,13 @@ const categories = [
   }
 
   // ── Magnetic about button ─────────────────────────────────────────────────
-  function initMagnetic() {
+  function initAboutMagnetic() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const btn = document.querySelector<HTMLElement>('.about-btn');
     if (!btn) return;
 
-    let rafId: ReturnType<typeof requestAnimationFrame> | null = null;
-
-    const onMove = (e: MouseEvent) => {
-      const rect   = btn.getBoundingClientRect();
-      const cx     = rect.left + rect.width  / 2;
-      const cy     = rect.top  + rect.height / 2;
-      const dx     = e.clientX - cx;
-      const dy     = e.clientY - cy;
-      const dist   = Math.sqrt(dx * dx + dy * dy);
-      const radius = Math.max(rect.width, rect.height) * 1.6;
-
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        if (dist < radius) {
-          const strength = 0.38;
-          const tx = dx * strength * (1 - dist / radius);
-          const ty = dy * strength * (1 - dist / radius);
-          btn.style.transform = `translate(${tx}px, ${ty}px)`;
-        } else {
-          btn.style.transform = '';
-        }
-      });
-    };
-
-    const onLeave = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      btn.style.transform = '';
-    };
-
-    document.addEventListener('mousemove', onMove);
-    btn.addEventListener('mouseleave', onLeave);
-
-    document.addEventListener('astro:before-swap', () => {
-      document.removeEventListener('mousemove', onMove);
-      btn.removeEventListener('mouseleave', onLeave);
-      if (rafId) cancelAnimationFrame(rafId);
-    }, { once: true });
+    const cleanup = initMagnetic(btn, { strength: 0.38, radiusMultiplier: 1.6 });
+    document.addEventListener('astro:before-swap', cleanup, { once: true });
   }
 
   // ── Category count roll-up ────────────────────────────────────────────────
@@ -378,6 +349,98 @@ const categories = [
     document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
   }
 
+  // ── Hero cursor trail (canvas, velocity-based dots) ─────────────────────
+  // Only on pointer devices; respects prefers-reduced-motion.
+  // Orange dots spawn when the cursor moves fast; fade out over ~20 frames.
+  function initHeroCursorTrail() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const canvas   = document.querySelector<HTMLCanvasElement>('.hero-trail-canvas');
+    const heroText = document.querySelector<HTMLElement>('.hero-text');
+    if (!canvas || !heroText) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Match canvas resolution to its CSS size
+    const syncSize = () => {
+      const r = canvas.getBoundingClientRect();
+      canvas.width  = Math.round(r.width  * devicePixelRatio);
+      canvas.height = Math.round(r.height * devicePixelRatio);
+    };
+    syncSize();
+
+    type Dot = { x: number; y: number; r: number; age: number; maxAge: number };
+    let dots: Dot[] = [];
+    let rafId: number;
+
+    const renderFrame = (draining = false) => {
+      const dpr = devicePixelRatio;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      dots = dots.filter(d => d.age <= d.maxAge);
+
+      for (const d of dots) {
+        const t       = d.age / d.maxAge;
+        const opacity = (1 - t) * (1 - t) * 0.24;   // quadratic fade
+        const radius  = d.r * (1 - t * 0.45);        // slight shrink as it ages
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 105, 0, ${opacity})`; // orange-500
+        ctx.fill();
+        d.age++;
+      }
+
+      ctx.restore();
+
+      if (draining && !dots.length) {
+        cancelAnimationFrame(rafId);
+      } else {
+        rafId = requestAnimationFrame(() => renderFrame(draining));
+      }
+    };
+
+    const onMove = (e: MouseEvent) => {
+      const rect  = canvas.getBoundingClientRect();
+      const speed = Math.sqrt(e.movementX ** 2 + e.movementY ** 2);
+      if (speed < 2.5) return; // ignore slow drift
+
+      dots.push({
+        x:      e.clientX - rect.left,
+        y:      e.clientY - rect.top,
+        r:      Math.min(2.5 + speed * 0.35, 9),
+        age:    0,
+        maxAge: 16 + Math.floor(Math.random() * 10),
+      });
+    };
+
+    const onEnter = () => {
+      heroText.addEventListener('mousemove', onMove);
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => renderFrame(false));
+    };
+
+    const onLeave = () => {
+      heroText.removeEventListener('mousemove', onMove);
+      // Let remaining dots fade out, then stop
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => renderFrame(true));
+    };
+
+    heroText.addEventListener('mouseenter', onEnter);
+    heroText.addEventListener('mouseleave', onLeave);
+
+    document.addEventListener('astro:before-swap', () => {
+      cancelAnimationFrame(rafId);
+      heroText.removeEventListener('mouseenter', onEnter);
+      heroText.removeEventListener('mouseleave', onLeave);
+      heroText.removeEventListener('mousemove', onMove);
+    }, { once: true });
+  }
+
   // ── Init all ─────────────────────────────────────────────────────────────
   function initAll() {
     initWorkNavScroll();
@@ -385,8 +448,9 @@ const categories = [
     initProjectCards();
     initParallax();
     initActiveSections();
-    initMagnetic();
+    initAboutMagnetic();
     initCounts();
+    initHeroCursorTrail();
   }
 
   initAll();
@@ -395,8 +459,26 @@ const categories = [
 
 <style>
 
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; /* needed so canvas can fill this container */
+  }
+
+  /* Cursor trail canvas — absolutely fills the hero, pointer-events off */
+  .hero-trail-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
   /* ===== HERO TEXT ===== */
   .hero-text {
+    position: relative; /* sit above the canvas */
+    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -551,19 +633,8 @@ const categories = [
     text-wrap: balance;
   }
 
+  /* .about-btn styles live in Button.astro (variant="secondary") */
   .about-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    border: 1px solid var(--color-taupe-400);
-    border-radius: 999px;
-    padding: 12px 20px;
-    font-family: var(--font-uncut);
-    font-size: 16px;
-    font-weight: 500;
-    letter-spacing: -0.28px;
-    color: var(--color-taupe-400);
-    text-decoration: none;
     will-change: transform;
     transition: border-color 0.15s, color 0.15s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     width: fit-content;
@@ -601,6 +672,7 @@ const categories = [
     flex-direction: column;
     gap: 0;
     margin-top: 72px;
+    scroll-margin-top: 80px;
   }
 
   .category-card:first-of-type {
@@ -761,10 +833,7 @@ const categories = [
     .project-link:hover .project-img        { scale: 1.13; }
     .project-link:hover .project-image::after { opacity: 0.2; }
     .project-link:hover .project-title      { color: var(--color-orange-500); }
-    .about-btn:hover {
-      border-color: var(--color-orange-500);
-      color: var(--color-orange-500);
-    }
+    /* .about-btn hover handled by Button.astro */
   }
 
   /* ── Reduced motion ──────────────────────────────────────────────────── */

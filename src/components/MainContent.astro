@@ -1,7 +1,7 @@
 ---
 ---
 
-<main class="main-content">
+<main class="main-content" id="main-content">
   <slot />
 </main>
 
@@ -16,6 +16,25 @@
     margin-right: 40px;
     padding-bottom: 80px;
     position: relative;
+    /* Subtle fade + rise on every page load / view-transition swap */
+    animation: pageEnter 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .main-content {
+      animation: none;
+    }
   }
 
   @media (max-width: 1023px) {

@@ -1,3 +1,6 @@
+---
+import Button from './Button.astro';
+---
 <footer class="site-footer">
   <video class="footer-bg-video" autoplay muted loop playsinline poster="/images/Footer_Static.png">
     <source src="/images/Footer_Video.mp4" type="video/mp4" />
@@ -26,99 +29,69 @@
       <span class="footer-label">CREATIVE DIRECTOR</span>
     </div>
 
-    <a href="mailto:hello@jeffherrera.com" class="footer-cta">
+    <Button href="mailto:hello@jeffherrera.com" variant="primary-dark" class="footer-cta">
       →&nbsp; Let's Talk
-    </a>
+    </Button>
 
   </div>
 </footer>
 
 <script>
+  import { initMagnetic } from '../utils/magnetic.ts';
+
   // ── Footer parallax + magnetic CTA ────────────────────────────────────────
   function initFooterEffects() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const footer = document.querySelector('.site-footer') as HTMLElement | null;
     const words   = footer?.querySelectorAll<HTMLElement>('.footer-word') ?? [];
     const cta     = footer?.querySelector<HTMLElement>('.footer-cta');
 
     if (!footer) return;
 
-    // ── Footer word parallax ────────────────────────────────────────────────
-    // Each word drifts horizontally at a different rate as the footer scrolls
-    // into view. Rate sign = direction; magnitude = speed relative to scroll.
-    // With multiplier 600, max shift = 0.5 × 0.30 × 600 = 90px.
-    const wordRates = [0.14, -0.26, 0.20, -0.32, 0.10, -0.22, 0.28, -0.16, 0.24, -0.18];
+    if (!reducedMotion) {
+      // ── Footer word parallax ──────────────────────────────────────────────
+      // Each word drifts horizontally at a different rate as the footer scrolls
+      // into view. Rate sign = direction; magnitude = speed relative to scroll.
+      const wordRates = [0.14, -0.26, 0.20, -0.32, 0.10, -0.22, 0.28, -0.16, 0.24, -0.18];
 
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const rect     = footer.getBoundingClientRect();
-        const vh       = window.innerHeight;
-        // progress: 0 when footer top hits bottom of viewport, 1 when it exits top
-        const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const rect     = footer.getBoundingClientRect();
+          const vh       = window.innerHeight;
+          const progress = Math.max(0, Math.min(1, (vh - rect.top) / (vh + rect.height)));
 
-        // Skip parallax on mobile — shifts would push words off the narrow screen
-        if (window.innerWidth >= 1024) {
-          words.forEach((word, i) => {
-            const rate  = wordRates[i % wordRates.length];
-            const shift = (progress - 0.5) * rate * 360; // ±px
-            word.style.transform = `translateX(${shift}px)`;
-          });
-        } else {
-          words.forEach(word => { word.style.transform = ''; });
-        }
+          // Skip parallax on mobile — shifts would push words off the narrow screen
+          if (window.innerWidth >= 1024) {
+            words.forEach((word, i) => {
+              const rate  = wordRates[i % wordRates.length];
+              const shift = (progress - 0.5) * rate * 360;
+              word.style.transform = `translateX(${shift}px)`;
+            });
+          } else {
+            words.forEach(word => { word.style.transform = ''; });
+          }
 
-        ticking = false;
-      });
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    // ── Magnetic CTA ────────────────────────────────────────────────────────
-    let ctaRaf: number | null = null;
-
-    const onCtaMove = (e: MouseEvent) => {
-      if (!cta) return;
-      const rect   = cta.getBoundingClientRect();
-      const cx     = rect.left + rect.width  / 2;
-      const cy     = rect.top  + rect.height / 2;
-      const dx     = e.clientX - cx;
-      const dy     = e.clientY - cy;
-      const dist   = Math.sqrt(dx * dx + dy * dy);
-      const radius = Math.max(rect.width, rect.height) * 1.4; // activation zone
-
-      if (dist < radius) {
-        const strength = 0.35;
-        const tx = dx * strength * (1 - dist / radius);
-        const ty = dy * strength * (1 - dist / radius);
-        if (ctaRaf) cancelAnimationFrame(ctaRaf);
-        ctaRaf = requestAnimationFrame(() => {
-          cta.style.transform = `translate(${tx}px, ${ty}px)`;
+          ticking = false;
         });
-      } else {
-        if (ctaRaf) cancelAnimationFrame(ctaRaf);
-        ctaRaf = requestAnimationFrame(() => {
-          if (cta) cta.style.transform = '';
-        });
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // ── Magnetic CTA ──────────────────────────────────────────────────────
+      let cleanupMagnetic: (() => void) | null = null;
+      if (cta) {
+        cleanupMagnetic = initMagnetic(cta, { strength: 0.35, radiusMultiplier: 1.4 });
       }
-    };
 
-    const onCtaLeave = () => {
-      if (cta) cta.style.transform = '';
-    };
-
-    document.addEventListener('mousemove', onCtaMove);
-    cta?.addEventListener('mouseleave', onCtaLeave);
-
-    document.addEventListener('astro:before-swap', () => {
-      window.removeEventListener('scroll', onScroll);
-      document.removeEventListener('mousemove', onCtaMove);
-      cta?.removeEventListener('mouseleave', onCtaLeave);
-      if (ctaRaf) cancelAnimationFrame(ctaRaf);
-    }, { once: true });
+      document.addEventListener('astro:before-swap', () => {
+        window.removeEventListener('scroll', onScroll);
+        cleanupMagnetic?.();
+      }, { once: true });
+    }
   }
 
   initFooterEffects();
@@ -214,38 +187,15 @@
     line-height: 1.15;
   }
 
-  .footer-cta {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px 24px;
-    border-radius: 999px;
-    background: var(--color-orange-950);
-    font-family: var(--font-uncut);
-    font-size: 15px;
-    color: var(--color-orange-50);
-    text-decoration: none;
-    line-height: 1.15;
+  /* Magnetic effect needs will-change + transform transition on top of Button base styles */
+  :global(.footer-cta) {
     will-change: transform;
-    transition: background 0.15s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  }
-
-  /* Hover on pointer devices only — no tap flash */
-  @media (hover: hover) {
-    .footer-cta:hover {
-      background: var(--color-orange-50);
-      color: var(--color-orange-950);
-    }
+    transition: background 0.15s, color 0.15s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .footer-word {
-      transition: none;
-    }
-
-    .footer-cta {
-      transition: none;
-    }
+    .footer-word { transition: none; }
+    :global(.footer-cta) { transition: none !important; }
   }
 
   /* ── Mobile ───────────────────────────────────────────────────────────── */

@@ -15,7 +15,7 @@
   </div>
   <!-- Drag cursor -->
   <div id="cursor-drag">
-    <svg width="31" height="34" viewBox="0 0 31 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="80" height="88" viewBox="0 0 31 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d_792_476)">
         <path d="M16.1543 12.4619H19.8457V13.6924H22.3076V14.9229H24.7695V16.1543H26V21.0771H24.7695V23.5381H22.3076V26H14.9229V23.5381H13.6924V21.0771H12.4619V18.6152H10V14.9229H12.4619V16.1543H13.6924V10H16.1543V12.4619Z" fill="white"/>
         <rect x="14.9231" y="24.7693" width="8.61539" height="1.23077" fill="#441306"/>
@@ -236,20 +236,18 @@
   }
 
   /* ── Drag cursor ──────────────────────────────────────────────────────
-     SVG is 31×34. HALF=6, so offsets = 6 − (31/2) = −9.5px (x),
-     6 − (34/2) = −11px (y) to center SVG on pointer.                    */
+     Rendered at 80×88px (31×34 scaled up). HALF=6 (cursor dot radius).
+     Offsets = HALF − (renderedW/2), HALF − (renderedH/2):
+     x = 6 − 40 = −34px,  y = 6 − 44 = −38px                           */
   #cursor-drag {
     position: absolute;
-    left: -9.5px;
-    top: -11px;
+    left: -34px;
+    top: -38px;
     opacity: 0;
     transition: opacity 0.12s ease;
     pointer-events: none;
   }
 
-  #cursor-drag svg {
-    width: 48px;
-  }
 
   #cursor.is-drag #cursor-drag {
     opacity: 1;
