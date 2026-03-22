@@ -57,8 +57,8 @@ const { Content } = await entry.render();
       </header>
 
       {entry.data.cover && (
-        <div class="work-cover">
-          <Image src={entry.data.cover} alt={entry.data.title} class="work-cover-img" width={760} height={480} transition:name={`work-cover-${entry.slug}`} />
+        <div class="work-cover" transition:name={`work-cover-${entry.slug}`}>
+          <Image src={entry.data.cover} alt={entry.data.title} class="work-cover-img" width={760} height={480} />
         </div>
       )}
 

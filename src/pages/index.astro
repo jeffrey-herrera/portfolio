@@ -106,9 +106,9 @@ const categories = [
               {category.items[0] && (
                 <a href={`/work/${category.items[0].slug}`} class="project-link" data-cursor-label="View Project">
                   <div class="project-card project-card--large">
-                    <div class="project-image project-image--wide">
+                    <div class="project-image project-image--wide" transition:name={`work-cover-${category.items[0].slug}`}>
                       {category.items[0].data.cover
-                        ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" transition:name={`work-cover-${category.items[0].slug}`} />
+                        ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" />
                         : <div class="project-placeholder"></div>
                       }
                     </div>
@@ -132,9 +132,9 @@ const categories = [
                       {pair.map((item) => (
                         <a href={`/work/${item.slug}`} class="project-link project-link--half" data-cursor-label="View Project">
                           <div class="project-card">
-                            <div class="project-image project-image--square">
+                            <div class="project-image project-image--square" transition:name={`work-cover-${item.slug}`}>
                               {item.data.cover
-                                ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} transition:name={`work-cover-${item.slug}`} />
+                                ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} />
                                 : <div class="project-placeholder"></div>
                               }
                             </div>
@@ -773,6 +773,10 @@ const categories = [
     width: 100%;
     position: relative;
     background: var(--color-taupe-300);
+    /* Force a stacking context so border-radius correctly clips GPU-promoted
+       children (will-change: scale/translate bypasses parent overflow:hidden
+       without this). */
+    isolation: isolate;
   }
 
   .project-image--wide   { aspect-ratio: 16 / 9; }
