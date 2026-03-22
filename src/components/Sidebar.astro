@@ -17,7 +17,7 @@ const navItems = [
 const socialLinks = [
   { href: 'https://instagram.com/_isthatjeff', label: 'Instagram', external: true },
   { href: 'https://linkedin.com/in/jeffrey-herrera', label: 'LinkedIn', external: true },
-  { href: 'mailto:hello@jeffherrera.com', label: 'Email', external: false },
+  { label: 'Email', copyEmail: true },
 ];
 
 const isHome      = currentPath === '/';
@@ -65,11 +65,17 @@ const playlistYears = isPlaylists
       <span class="sidebar-label">Let's Talk</span>
       <div class="sidebar-links">
         {socialLinks.map((link) => (
-          <a
-            href={link.href}
-            class="sidebar-link"
-            {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
-          >{link.label}</a>
+          link.copyEmail ? (
+            <button class="sidebar-link js-copy-email" data-cursor-label="Copy email" type="button">
+              {link.label}
+            </button>
+          ) : (
+            <a
+              href={link.href}
+              class="sidebar-link"
+              {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
+            >{link.label}</a>
+          )
         ))}
       </div>
     </div>
@@ -175,11 +181,17 @@ const playlistYears = isPlaylists
     <span class="mobile-social-label">Let's Talk</span>
     <div class="mobile-social-links">
       {socialLinks.map((link) => (
-        <a
-          href={link.href}
-          class="mobile-social-link"
-          {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
-        >{link.label}</a>
+        link.copyEmail ? (
+          <button class="mobile-social-link js-copy-email" type="button">
+            {link.label}
+          </button>
+        ) : (
+          <a
+            href={link.href}
+            class="mobile-social-link"
+            {...(link.external ? { target: '_blank', rel: 'noopener' } : {})}
+          >{link.label}</a>
+        )
       ))}
     </div>
   </div>
@@ -288,6 +300,18 @@ const playlistYears = isPlaylists
     color: var(--color-orange-950);
     text-decoration: none;
     transition: color 0.15s;
+  }
+
+  button.sidebar-link {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    cursor: pointer;
+    text-align: left;
   }
 
   .sidebar-link:hover    { color: var(--color-orange-500); }
@@ -553,6 +577,14 @@ const playlistYears = isPlaylists
     transition: color 0.15s;
   }
 
+  button.mobile-social-link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+
   /* No hover state change — links are orange-50 on orange bg; any shift looks off */
 
 </style>
@@ -737,12 +769,30 @@ const playlistYears = isPlaylists
     }, { once: true });
   }
 
+  // ─── Copy email ───────────────────────────────────────────────────────────
+  function initCopyEmail() {
+    document.querySelectorAll<HTMLButtonElement>('.js-copy-email').forEach(btn => {
+      btn.addEventListener('click', () => {
+        navigator.clipboard.writeText('hello@jeffherrera.com').then(() => {
+          const prev = btn.textContent!.trim();
+          btn.textContent = 'Copied!';
+          if (btn.dataset.cursorLabel) btn.dataset.cursorLabel = 'Copied!';
+          setTimeout(() => {
+            btn.textContent = prev;
+            if (btn.dataset.cursorLabel) btn.dataset.cursorLabel = 'Copy email';
+          }, 2000);
+        });
+      });
+    });
+  }
+
   // ─── Init ─────────────────────────────────────────────────────────────────
   function initAll() {
     initBackToTop();
     initMobileMenu();
     initWorkNav();
     initYearNav();
+    initCopyEmail();
   }
 
   initAll();
