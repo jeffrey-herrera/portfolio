@@ -106,14 +106,14 @@ const categories = [
               {category.items[0] && (
                 <a href={`/work/${category.items[0].slug}`} class="project-link" data-cursor-label="View Project">
                   <div class="project-card project-card--large">
-                    <div class="project-image project-image--wide" transition:name={`work-cover-${category.items[0].slug}`}>
+                    <div class="project-image project-image--wide">
                       {category.items[0].data.cover
                         ? <Image src={category.items[0].data.cover} alt={category.items[0].data.title} class="project-img" width={800} height={500} loading="eager" />
                         : <div class="project-placeholder"></div>
                       }
                     </div>
                     <div class="project-info">
-                      <span class="project-title" transition:name={`work-title-${category.items[0].slug}`}>{category.items[0].data.title}</span>
+                      <span class="project-title">{category.items[0].data.title}</span>
                       <span class="project-cat">{category.name}</span>
                     </div>
                   </div>
@@ -132,14 +132,14 @@ const categories = [
                       {pair.map((item) => (
                         <a href={`/work/${item.slug}`} class="project-link project-link--half" data-cursor-label="View Project">
                           <div class="project-card">
-                            <div class="project-image project-image--square" transition:name={`work-cover-${item.slug}`}>
+                            <div class="project-image project-image--square">
                               {item.data.cover
                                 ? <Image src={item.data.cover} alt={item.data.title} class="project-img" width={400} height={400} />
                                 : <div class="project-placeholder"></div>
                               }
                             </div>
                             <div class="project-info">
-                              <span class="project-title" transition:name={`work-title-${item.slug}`}>{item.data.title}</span>
+                              <span class="project-title">{item.data.title}</span>
                               <span class="project-cat">{item.data.tags[0]}</span>
                             </div>
                           </div>
