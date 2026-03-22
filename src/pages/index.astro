@@ -321,11 +321,26 @@ const categories = [
     document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
   }
 
-  // ── Project card entrance — Option B: staggered fade + slide-up ──────────
+  // ── Project card entrance — staggered fade + slide-up ────────────────────
   // Large card enters first; within each pair, the right card is delayed 90ms.
+  // Cards already in the viewport (e.g. after a view transition) are made
+  // visible immediately with no duration so they don't flash invisible between
+  // the VT pseudo-element handing off and the IO callback firing.
   function initProjectCards() {
     const cards = document.querySelectorAll<HTMLElement>('a.project-link');
     if (!cards.length) return;
+
+    // Immediately reveal any card already in the viewport
+    const vh = window.innerHeight;
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < vh && rect.bottom > 0) {
+        card.style.transitionDuration = '0s';
+        card.classList.add('is-visible');
+        // Re-enable CSS transitions on the next frame so hover still animates
+        requestAnimationFrame(() => { card.style.transitionDuration = ''; });
+      }
+    });
 
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -345,7 +360,8 @@ const categories = [
       });
     }, { threshold: 0.08 });
 
-    cards.forEach(card => io.observe(card));
+    // Only observe cards not already made visible above
+    cards.forEach(card => { if (!card.classList.contains('is-visible')) io.observe(card); });
     document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
   }
 
