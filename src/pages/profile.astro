@@ -1,0 +1,397 @@
+---
+import '../styles/global.css';
+import Analytics from '../components/Analytics.astro';
+import { playlists } from '../data/playlists';
+
+const latest = playlists[0];
+
+const socialLinks = [
+  { href: 'https://instagram.com/_isthatjeff', label: 'Instagram' },
+  { href: 'https://linkedin.com/in/jeffrey-herrera', label: 'LinkedIn' },
+  { href: 'mailto:hello@jeffherrera.com', label: 'Email' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Jeff Herrera</title>
+    <meta name="description" content="Jeff Herrera — Creative Director based in NYC." />
+  </head>
+
+  <body>
+    <main class="profile">
+
+      <!-- Header -->
+      <header class="profile-header">
+        <svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 32 32" fill="none" aria-label="Jeff Herrera logo">
+          <g clip-path="url(#clip0)">
+            <path d="M30.5489 15.984C30.5489 14.1891 29.3498 12.7491 27.7784 12.2845L26.1087 11.7908L26.9403 10.2611C27.7229 8.82141 27.5525 6.95535 26.2834 5.68617C25.0142 4.41696 23.148 4.24653 21.7084 5.02915L20.1787 5.86074L19.6851 4.19106C19.2204 2.61967 17.7804 1.42065 15.9855 1.42065C14.1906 1.42065 12.7505 2.61969 12.2859 4.19106L11.7923 5.86074L10.2626 5.0292C8.82291 4.2466 6.95682 4.41698 5.68764 5.68617C4.41845 6.95535 4.24807 8.82144 5.03067 10.2611L5.86221 11.7908L4.19253 12.2844C2.63343 12.7454 1.44087 14.1667 1.42234 15.9421L1.42212 15.984C1.42212 17.7789 2.62114 19.219 4.19253 19.6836L5.86221 20.1772L5.03062 21.7069C4.24801 23.1466 4.41844 25.0127 5.68764 26.2819C6.95682 27.5511 8.82289 27.7214 10.2626 26.9388L11.7923 26.1073L12.286 27.7769C12.7505 29.3483 14.1906 30.5474 15.9855 30.5474V31.9559C13.5268 31.9559 11.5653 30.3072 10.9353 28.1763C8.98299 29.2375 6.43024 29.0164 4.69171 27.2778C2.95317 25.5393 2.73192 22.9865 3.79322 21.0342C1.66231 20.4042 0.0136722 18.4427 0.0136719 15.984C0.0136719 13.5254 1.6623 11.5638 3.79322 10.9338C2.73195 8.98152 2.95319 6.42876 4.69171 4.69024C6.43023 2.95171 8.98299 2.73048 10.9353 3.79174C11.5653 1.66083 13.5269 0.0121998 15.9855 0.0121994C18.4442 0.0121994 20.4056 1.66084 21.0357 3.79174C22.988 2.73045 25.5408 2.9517 27.2793 4.69024C29.0178 6.42877 29.239 8.98152 28.1777 10.9338C30.3087 11.5638 31.9573 13.5254 31.9573 15.984C31.9573 18.4427 30.3087 20.4042 28.1777 21.0342C29.239 22.9865 29.0178 25.5393 27.2793 27.2778C25.5408 29.0164 22.988 29.2376 21.0357 28.1763C20.4057 30.3072 18.4442 31.9559 15.9855 31.9559V30.5474C17.7804 30.5474 19.2204 29.3484 19.685 27.7769L20.1787 26.1073L21.7084 26.9389C23.1481 27.7215 25.0142 27.5511 26.2834 26.2819C27.5526 25.0127 27.723 23.1466 26.9403 21.7069L26.1087 20.1772L27.7784 19.6835C29.3376 19.2225 30.5301 17.8014 30.5487 16.026L30.5489 15.984Z" fill="#FF6900"/>
+            <path d="M9.83074 18.0833C7.89891 17.8316 6.70507 16.278 6.95627 14.3424L7.0221 13.8352L8.86067 14.0747L8.79484 14.582C8.65625 15.6498 9.1605 16.4621 10.0265 16.5749C10.8925 16.6878 11.5723 16.0433 11.7126 14.9621L12.5233 8.71498L14.3619 8.95451L13.5511 15.2016C13.2982 17.1505 11.7626 18.335 9.83074 18.0833Z" fill="#FF6900"/>
+            <path d="M16.7905 22.0412L15.4556 12.714L17.2909 12.4504L17.8248 16.1812L21.5486 15.6463L21.0146 11.9154L22.8499 11.6517L24.1848 20.9789L22.3495 21.2426L21.7641 17.1519L18.0403 17.6869L18.6258 21.7776L16.7905 22.0412Z" fill="#FF6900"/>
+          </g>
+          <defs>
+            <clipPath id="clip0">
+              <rect width="32" height="32" fill="white"/>
+            </clipPath>
+          </defs>
+        </svg>
+        <h1 class="profile-name">Jeff Herrera</h1>
+      </header>
+
+      <!-- Cards -->
+      <div class="profile-cards">
+
+        <!-- Portfolio -->
+        <a href="https://jeffherrera.com" class="card card--portfolio" target="_blank" rel="noopener">
+          <div class="card-portfolio-inner">
+            <span class="card-eyebrow">Featured work</span>
+            <span class="card-title">My Portfolio</span>
+          </div>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+
+        <!-- Latest playlist -->
+        <div class="card card--playlist">
+          <div class="playlist-top">
+            <div class="playlist-cover-wrap">
+              <img
+                src={latest.coverUrl}
+                alt={`${latest.name} playlist cover`}
+                class="playlist-cover"
+                width="130"
+                height="130"
+                loading="eager"
+              />
+            </div>
+            <div class="playlist-featured">
+              <span class="card-eyebrow">Latest playlist</span>
+              <p class="playlist-name">{latest.name}</p>
+              <p class="playlist-track">{latest.featuredTrack}</p>
+            </div>
+          </div>
+          <div class="playlist-links">
+            <a href={latest.spotifyUrl} class="platform-link platform-link--spotify" target="_blank" rel="noopener" aria-label="Open on Spotify">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+              Spotify
+            </a>
+            <a href={latest.appleMusicUrl} class="platform-link platform-link--apple" target="_blank" rel="noopener" aria-label="Open on Apple Music">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/></svg>
+              Apple Music
+            </a>
+          </div>
+        </div>
+
+        <!-- Social links -->
+        <div class="card card--social">
+          <span class="card-eyebrow">Let's talk</span>
+          <div class="social-links">
+            {socialLinks.map(link => (
+              <a
+                href={link.href}
+                class="social-link"
+                {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener' } : {})}
+              >
+                {link.label}
+                <span class="social-arrow" aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <Analytics />
+  </body>
+</html>
+
+<style>
+  /* ── Reset & base ─────────────────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+
+  body {
+    background: var(--color-cream);
+    min-height: 100dvh;
+    font-family: var(--font-uncut);
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { display: block; max-width: 100%; }
+
+  /* ── Page shell ───────────────────────────────────────────────────────── */
+  .profile {
+    width: 100%;
+    max-width: 600px;
+    padding: 48px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* ── Header ───────────────────────────────────────────────────────────── */
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+  }
+
+  .profile-name {
+    font-family: var(--font-fragment);
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--color-orange-950);
+    font-feature-settings: 'dlig' 1, 'ss03' 1, 'ss04' 1;
+  }
+
+  /* ── Cards container ──────────────────────────────────────────────────── */
+  .profile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── Base card ────────────────────────────────────────────────────────── */
+  .card {
+    border-radius: 16px;
+    padding: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-eyebrow {
+    display: block;
+    font-family: var(--font-uncut);
+    font-size: 12px;
+    font-weight: 700 !important;
+    letter-spacing: 1.5%;
+    text-transform: uppercase;
+  }
+
+  /* ── Portfolio card ───────────────────────────────────────────────────── */
+  .card--portfolio {
+    background: var(--color-orange-950);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px;
+    cursor: pointer;
+
+    /* Subtle noise texture via repeating diagonal lines */
+    background-image:
+      repeating-linear-gradient(
+        135deg,
+        rgba(255,255,255,0.025) 0px,
+        rgba(255,255,255,0.025) 1px,
+        transparent 1px,
+        transparent 6px
+      );
+    background-color: var(--color-orange-950);
+  }
+
+  .card--portfolio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(68, 19, 6, 0.25);
+  }
+
+  .card-portfolio-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+  }
+
+  .card--portfolio .card-eyebrow {
+    color: rgba(255, 105, 0, 0.7);
+  }
+
+  .card--portfolio .card-title {
+    font-family: var(--font-fragment);
+    font-size: 28px;
+    line-height: 1.1;
+    color: var(--color-orange-50);
+    font-feature-settings: 'dlig' 1, 'ss03' 1, 'ss04' 1;
+  }
+
+  .card-arrow {
+    font-size: 40px;
+    color: var(--color-orange-500);
+    flex-shrink: 0;
+    position: relative;
+    transition: transform 0.2s ease;
+  }
+
+  .card--portfolio:hover .card-arrow {
+    transform: translate(3px, -3px);
+  }
+
+  /* ── Playlist card ────────────────────────────────────────────────────── */
+  .card--playlist {
+    background: white;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(68, 19, 6, 0.06), 0 4px 16px rgba(68, 19, 6, 0.04);
+  }
+
+  .card--playlist:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(68, 19, 6, 0.1);
+  }
+
+  .playlist-top {
+    display: flex;
+    gap: 20px;
+  }
+
+  .playlist-cover-wrap {
+    width: 25%;
+    aspect-ratio: 1/1;
+    flex-shrink: 0;
+  }
+
+  .playlist-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .playlist-featured {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+  }
+
+  .card--playlist .card-eyebrow {
+    color: var(--color-taupe-400);
+  }
+
+  .playlist-name {
+    font-family: var(--font-uncut);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -2%;
+    color: var(--color-orange-950);
+  }
+
+  .playlist-track {
+    font-size: 14px;
+    color: var(--color-taupe-400);
+  }
+
+  .playlist-links {
+    display: flex;
+    gap: 10px;
+  }
+
+  .platform-link {
+    display: inline-flex;
+    flex: 1 1;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 15px 15px;
+    border-radius: 999px;
+    transition: opacity 0.15s ease;
+    width: 100%;
+  }
+
+  .platform-link svg {
+    width: 20px;
+    height: 20px;
+    max-width: 20px;
+  }
+
+  .platform-link:hover {
+    opacity: 0.8;
+  }
+
+  .platform-link--spotify {
+    background: #1ed760;
+    color: #000;
+  }
+
+  .platform-link--apple {
+    background: #fc3c44;
+    color: #fff;
+  }
+
+  /* ── Social card ──────────────────────────────────────────────────────── */
+  .card--social {
+    background: transparent;
+    border: 1.5px solid var(--color-taupe-300);
+    padding: 20px;
+  }
+
+  .card--social .card-eyebrow {
+    color: var(--color-taupe-400);
+    margin-bottom: 14px;
+  }
+
+  .social-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-orange-950);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-taupe-300);
+    transition: color 0.15s ease;
+  }
+
+  .social-link:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .social-link:first-child {
+    padding-top: 0;
+  }
+
+  .social-link:hover {
+    color: var(--color-orange-500);
+  }
+
+  .social-arrow {
+    font-size: 14px;
+    color: var(--color-taupe-400);
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .social-link:hover .social-arrow {
+    transform: translate(2px, -2px);
+    color: var(--color-orange-500);
+  }
+
+  /* ── Footer ───────────────────────────────────────────────────────────── */
+  .profile-footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-taupe-400);
+    padding-bottom: 8px;
+  }
+</style>

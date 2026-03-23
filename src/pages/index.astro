@@ -244,7 +244,7 @@ const categories = [
           const rect     = container.getBoundingClientRect();
           const progress = (vh - rect.top) / (vh + rect.height);
           const clamped  = Math.max(0, Math.min(1, progress));
-          const shift    = (clamped - 0.5) * -30; // ±15px
+          const shift    = (clamped - 0.5) * -20; // ±10px — keeps within scale:1.08 buffer
           img.style.translate = `0 ${shift}px`;
         });
         ticking = false;
@@ -510,7 +510,7 @@ const categories = [
     line-height: 1.15;
     /* Fluid from 24px on small phones up to 80px at desktop.
        letter-spacing in em so it scales proportionally. */
-    font-size: clamp(2.4rem, 5.5vw, 5rem);
+    font-size: clamp(2rem, 5.5vw, 5rem);
     letter-spacing: -0.014em;
   }
 
@@ -887,6 +887,10 @@ const categories = [
       min-height: auto;
       grid-column: 1 / -1;
       gap: 8px;
+    }
+
+    .hero-text br {
+      display: none;
     }
 
     /* Portrait pill: scale to sit flush with 1.5rem line-height (~28px) */
