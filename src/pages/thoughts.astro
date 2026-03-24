@@ -69,10 +69,23 @@ const sortedThoughts = allThoughts
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--color-white);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: transform 0.25s ease;
+    gap: 20px;
+    padding: 20px 20px 60px 20px;
+    background: white;
+    border-radius: 10px 10px 2px 2px;
+  }
+
+  /* Perforated stamp edge along the bottom */
+  .post-card::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 0;
+    right: 0;
+    height: 18px;
+    background: radial-gradient(circle, var(--color-cream) 9px, transparent 9px)
+      center / 20px 18px repeat-x;
+    pointer-events: none;
   }
 
   /* ── Cover image ─────────────────────────────────────────────────────── */
@@ -80,8 +93,7 @@ const sortedThoughts = allThoughts
     aspect-ratio: 16 / 9;
     background: var(--color-taupe-300);
     overflow: hidden;
-    opacity: 0.85;
-    transition: opacity 0.25s ease;
+    border-radius: 4px;
   }
 
   .post-cover--placeholder {
@@ -93,6 +105,8 @@ const sortedThoughts = allThoughts
     height: 100%;
     object-fit: cover;
     display: block;
+    transform: scale(1.01);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ── Text block ──────────────────────────────────────────────────────── */
@@ -100,46 +114,42 @@ const sortedThoughts = allThoughts
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 16px 20px 28px;
   }
 
   .post-title {
-    font-family: var(--font-fragment);
+    font-family: var(--font-uncut);
     font-size: 22px;
-    font-weight: 400;
-    letter-spacing: -0.3px;
+    font-weight: 700;
+    letter-spacing: -0.44px;
     line-height: 1.2;
     color: var(--color-orange-950);
     margin: 0;
-    font-feature-settings: 'dlig' 1, 'ss03' 1, 'ss04' 1;
+    transition: color 0.2s ease;
   }
 
   .post-excerpt {
     font-family: var(--font-uncut);
-    font-size: 16px;
-    font-weight: 400;
+    font-size: 14px;
     letter-spacing: -0.14px;
-    line-height: 1.5;
+    line-height: 1.35;
     color: var(--color-taupe-400);
     margin: 0;
     text-wrap: balance;
   }
 
   @media (hover: hover) {
-    .post-card:hover {
-      transform: translateY(-4px);
+    .post-card:hover .post-cover-img {
+      transform: scale(1.05);
     }
-    .post-card:hover .post-cover {
-      opacity: 1;
+    .post-card:hover .post-title {
+      color: var(--color-orange-500);
     }
   }
 
   /* ── Reduced motion ──────────────────────────────────────────────────── */
   @media (prefers-reduced-motion: reduce) {
-    .post-card,
-    .post-title,
-    .post-excerpt,
-    .post-cover-img {
+    .post-cover-img,
+    .post-title {
       transition: none;
     }
   }
@@ -152,10 +162,6 @@ const sortedThoughts = allThoughts
 
     .post-title {
       font-size: 20px;
-    }
-
-    .post-excerpt {
-      font-size: 14px;
     }
   }
 </style>
