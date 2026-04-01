@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "portfolio-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "4322"],
+      "runtimeExecutable": "/opt/homebrew/bin/node",
+      "runtimeArgs": ["/Users/jeffherrera/Developer/portfolio/node_modules/.bin/astro", "dev", "--port", "4322"],
       "port": 4322
     }
   ]
