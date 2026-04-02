@@ -7,28 +7,65 @@ import { Image } from 'astro:assets';
 import { formatReadTime, getReadTimeMinutes } from '../../utils/readTime';
 
 export async function getStaticPaths() {
+  const PALETTE_STATIC = [{"id":16,"bg":"#740909","title":"#abf5ed","excerpt":"#abf5ed"},{"id":93,"bg":"#000000","title":"#a6e6db","excerpt":"#a6e6db"},{"id":58,"bg":"#681916","title":"#33ff7d","excerpt":"#33ff7d"},{"id":84,"bg":"#ffcfc4","title":"#0f261f","excerpt":"#0f261f"},{"id":79,"bg":"#651300","title":"#2dbc94","excerpt":"#2dbc94"},{"id":198,"bg":"#a93400","title":"#ffe600","excerpt":"#40c945"},{"id":46,"bg":"#ff5200","title":"#000000","excerpt":"#000000"},{"id":19,"bg":"#522000","title":"#7aff00","excerpt":"#7aff00"},{"id":2,"bg":"#ff8c00","title":"#0d2b52","excerpt":"#0d2b52"},{"id":4,"bg":"#c3a55c","title":"#3400a3","excerpt":"#3400a3"},{"id":50,"bg":"#ebd999","title":"#2d0060","excerpt":"#2d0060"},{"id":42,"bg":"#e0b81f","title":"#2619d1","excerpt":"#2619d1"},{"id":60,"bg":"#fff59e","title":"#0d2b52","excerpt":"#0d2b52"},{"id":22,"bg":"#ffff00","title":"#0024cc","excerpt":"#0024cc"},{"id":52,"bg":"#f5f5b8","title":"#000000","excerpt":"#000000"},{"id":168,"bg":"#f2ff26","title":"#003e83","excerpt":"#7e3075"},{"id":61,"bg":"#bdf226","title":"#340059","excerpt":"#340059"},{"id":83,"bg":"#bcd382","title":"#202d85","excerpt":"#202d85"},{"id":69,"bg":"#9cb29e","title":"#000000","excerpt":"#000000"},{"id":119,"bg":"#a6e6db","title":"#0d2b52","excerpt":"#0d2b52"},{"id":75,"bg":"#abf5ed","title":"#202d85","excerpt":"#202d85"},{"id":106,"bg":"#008aa1","title":"#06004f","excerpt":"#06004f"},{"id":56,"bg":"#bfabcc","title":"#2619d1","excerpt":"#2619d1"},{"id":346,"bg":"#b319ab","title":"#b5ffc2","excerpt":"#bdf226"},{"id":273,"bg":"#ffb3f0","title":"#6f0043","excerpt":"#9b5348"},{"id":59,"bg":"#ff5ec4","title":"#000000","excerpt":"#000000"},{"id":157,"bg":"#6f0043","title":"#d1bd19","excerpt":"#4f8fe6"},{"id":101,"bg":"#e6adcf","title":"#0024cc","excerpt":"#0024cc"},{"id":27,"bg":"#ffa6d9","title":"#1b3644","excerpt":"#1b3644"},{"id":63,"bg":"#5c2c45","title":"#29bdad","excerpt":"#29bdad"},{"id":261,"bg":"#a10045","title":"#fff59e","excerpt":"#80ffcc"},{"id":104,"bg":"#a10b2b","title":"#f5f5b8","excerpt":"#f5f5b8"},{"id":124,"bg":"#730f1f","title":"#e0b81f","excerpt":"#99b333"},{"id":25,"bg":"#c9303e","title":"#bfffe6","excerpt":"#bfffe6"},{"id":18,"bg":"#d1b0b3","title":"#2d0060","excerpt":"#2d0060"},{"id":6,"bg":"#ff616b","title":"#000831","excerpt":"#000831"}];
+
+  function _hashSlug(slug: string): number {
+    let hash = 5381;
+    for (let i = 0; i < slug.length; i++) {
+      hash = ((hash << 5) + hash + slug.charCodeAt(i)) | 0;
+    }
+    return Math.abs(hash) % PALETTE_STATIC.length;
+  }
+
+  function _hexToHue(hex: string): number {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    if (max === min) return 0;
+    const d = max - min;
+    let h = max === r ? (g - b) / d + (g < b ? 6 : 0)
+          : max === g ? (b - r) / d + 2
+          : (r - g) / d + 4;
+    return h * 60;
+  }
+
+  function _hueDist(a: number, b: number): number {
+    const d = Math.abs(a - b) % 360;
+    return d > 180 ? 360 - d : d;
+  }
+
   const thoughtEntries = await getCollection('thoughts');
+  const sorted = [...thoughtEntries].sort((a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+  const paletteMap = new Map<string, typeof PALETTE_STATIC[0]>();
+  const built: Array<{ slug: string; palette: typeof PALETTE_STATIC[0] }> = [];
+
+  for (const thought of sorted) {
+    const startIdx = _hashSlug(thought.slug);
+    let palette = PALETTE_STATIC[startIdx];
+    if (built.length > 0) {
+      const prevHue = _hexToHue(built[built.length - 1].palette.bg);
+      for (let offset = 0; offset < PALETTE_STATIC.length; offset++) {
+        const candidate = PALETTE_STATIC[(startIdx + offset) % PALETTE_STATIC.length];
+        if (_hueDist(_hexToHue(candidate.bg), prevHue) >= 45) {
+          palette = candidate;
+          break;
+        }
+      }
+    }
+    built.push({ slug: thought.slug, palette });
+    paletteMap.set(thought.slug, palette);
+  }
+
   return thoughtEntries.map(entry => ({
     params: { slug: entry.slug },
-    props: { entry },
+    props: { entry, palette: paletteMap.get(entry.slug)! },
   }));
 }
 
-// ── Same palette + hash as thoughts.astro ─────────────────────────────────
-const PALETTE = [{"id":16,"bg":"#740909","title":"#abf5ed","excerpt":"#abf5ed"},{"id":93,"bg":"#000000","title":"#a6e6db","excerpt":"#a6e6db"},{"id":58,"bg":"#681916","title":"#33ff7d","excerpt":"#33ff7d"},{"id":84,"bg":"#ffcfc4","title":"#0f261f","excerpt":"#0f261f"},{"id":79,"bg":"#651300","title":"#2dbc94","excerpt":"#2dbc94"},{"id":198,"bg":"#a93400","title":"#ffe600","excerpt":"#40c945"},{"id":46,"bg":"#ff5200","title":"#000000","excerpt":"#000000"},{"id":19,"bg":"#522000","title":"#7aff00","excerpt":"#7aff00"},{"id":2,"bg":"#ff8c00","title":"#0d2b52","excerpt":"#0d2b52"},{"id":4,"bg":"#c3a55c","title":"#3400a3","excerpt":"#3400a3"},{"id":50,"bg":"#ebd999","title":"#2d0060","excerpt":"#2d0060"},{"id":42,"bg":"#e0b81f","title":"#2619d1","excerpt":"#2619d1"},{"id":60,"bg":"#fff59e","title":"#0d2b52","excerpt":"#0d2b52"},{"id":22,"bg":"#ffff00","title":"#0024cc","excerpt":"#0024cc"},{"id":52,"bg":"#f5f5b8","title":"#000000","excerpt":"#000000"},{"id":168,"bg":"#f2ff26","title":"#003e83","excerpt":"#7e3075"},{"id":61,"bg":"#bdf226","title":"#340059","excerpt":"#340059"},{"id":83,"bg":"#bcd382","title":"#202d85","excerpt":"#202d85"},{"id":69,"bg":"#9cb29e","title":"#000000","excerpt":"#000000"},{"id":119,"bg":"#a6e6db","title":"#0d2b52","excerpt":"#0d2b52"},{"id":75,"bg":"#abf5ed","title":"#202d85","excerpt":"#202d85"},{"id":106,"bg":"#008aa1","title":"#06004f","excerpt":"#06004f"},{"id":56,"bg":"#bfabcc","title":"#2619d1","excerpt":"#2619d1"},{"id":346,"bg":"#b319ab","title":"#b5ffc2","excerpt":"#bdf226"},{"id":273,"bg":"#ffb3f0","title":"#6f0043","excerpt":"#9b5348"},{"id":59,"bg":"#ff5ec4","title":"#000000","excerpt":"#000000"},{"id":157,"bg":"#6f0043","title":"#d1bd19","excerpt":"#4f8fe6"},{"id":101,"bg":"#e6adcf","title":"#0024cc","excerpt":"#0024cc"},{"id":27,"bg":"#ffa6d9","title":"#1b3644","excerpt":"#1b3644"},{"id":63,"bg":"#5c2c45","title":"#29bdad","excerpt":"#29bdad"},{"id":261,"bg":"#a10045","title":"#fff59e","excerpt":"#80ffcc"},{"id":104,"bg":"#a10b2b","title":"#f5f5b8","excerpt":"#f5f5b8"},{"id":124,"bg":"#730f1f","title":"#e0b81f","excerpt":"#99b333"},{"id":25,"bg":"#c9303e","title":"#bfffe6","excerpt":"#bfffe6"},{"id":18,"bg":"#d1b0b3","title":"#2d0060","excerpt":"#2d0060"},{"id":6,"bg":"#ff616b","title":"#000831","excerpt":"#000831"}];
-
-function hashSlug(slug: string): number {
-  let hash = 5381;
-  for (let i = 0; i < slug.length; i++) {
-    hash = ((hash << 5) + hash + slug.charCodeAt(i)) | 0;
-  }
-  return Math.abs(hash) % PALETTE.length;
-}
-
-const { entry } = Astro.props;
+const { entry, palette } = Astro.props;
 const { Content } = await entry.render();
 const readTimeMinutes = getReadTimeMinutes(entry.body);
-const palette = PALETTE[hashSlug(entry.slug)];
 ---
 
 <Layout
@@ -56,8 +93,10 @@ const palette = PALETTE[hashSlug(entry.slug)];
           </div>
         )}
         <div class="ticket-info">
-          <h1 class="ticket-title">{entry.data.title}</h1>
-          <p class="ticket-desc">{entry.data.description}</p>
+          <div class="ticket-text">
+            <h1 class="ticket-title">{entry.data.title}</h1>
+            <p class="ticket-desc">{entry.data.description}</p>
+          </div>
           <div class="ticket-meta">
             <span><span class="meta-label">DATE</span>{entry.data.publishedAt.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}</span>
             <span><span class="meta-label">READ</span>{formatReadTime(readTimeMinutes)}</span>
@@ -87,7 +126,7 @@ const palette = PALETTE[hashSlug(entry.slug)];
     border-radius: 10px 10px 2px 2px;
     overflow: hidden;
     position: relative;
-    margin-bottom: 52px;
+    margin-bottom: 80px;
   }
 
   /* Perforated bottom edge */
@@ -119,10 +158,10 @@ const palette = PALETTE[hashSlug(entry.slug)];
 
   .ticket-info {
     order: -1;
-    padding: clamp(32px, 4vw, 60px);
+    padding: clamp(32px, 4vw, 40px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     gap: 12px;
   }
 
@@ -138,7 +177,7 @@ const palette = PALETTE[hashSlug(entry.slug)];
 
   .ticket-desc {
     font-family: var(--font-uncut);
-    font-size: clamp(14px, 1.2vw, 18px);
+    font-size: clamp(14px, 1.2vw, 24px);
     line-height: 1.45;
     color: color-mix(in srgb, var(--card-title) 70%, var(--card-bg));
     margin: 0;
@@ -146,6 +185,7 @@ const palette = PALETTE[hashSlug(entry.slug)];
 
   .ticket-meta {
     display: flex;
+    justify-content: space-between;
     gap: 20px;
     margin-top: 8px;
     padding-top: 12px;
@@ -166,10 +206,10 @@ const palette = PALETTE[hashSlug(entry.slug)];
   /* ── Body — no container, sits on page bg ────────────────────────────── */
   .thought-body {
     font-family: var(--font-uncut);
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1.7;
     color: var(--color-orange-950);
-    max-width: 640px;
+    max-width: 760px;
   }
 
   .thought-body :global(h2) {
@@ -182,7 +222,7 @@ const palette = PALETTE[hashSlug(entry.slug)];
 
   .thought-body :global(p) {
     margin: 0 0 24px;
-    color: var(--color-taupe-500);
+    color: var(--color-orange-950);
   }
 
   .thought-body :global(a) {
@@ -192,6 +232,19 @@ const palette = PALETTE[hashSlug(entry.slug)];
 
   .thought-body :global(a:hover) {
     text-decoration: underline;
+  }
+
+  /* ── Intro / lede mark ────────────────────────────────────────────────── */
+  .thought-body :global(mark) {
+    background: none;
+    font-family: var(--font-fragment);
+    font-size: 30px;
+    line-height: 1.35;
+    color: var(--color-orange-950);
+    display: block;
+    margin-bottom: 40px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--color-taupe-300);
   }
 
   /* ── Entrance animation ──────────────────────────────────────────────── */

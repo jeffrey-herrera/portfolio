@@ -100,8 +100,10 @@ for (const thought of sorted) {
                 )}
               </div>
               <div class="post-text">
-                <h2 class="post-title">{thought.data.title}</h2>
-                <p class="post-excerpt">{thought.data.description}</p>
+                <div class="post-info">
+                  <h2 class="post-title">{thought.data.title}</h2>
+                  <p class="post-excerpt">{thought.data.description}</p>
+                </div>
                 <div class="post-meta">
                   <span class="post-meta-item"><span class="post-meta-label">DATE</span>{formatDate(thought.data.publishedAt)}</span>
                   <span class="post-meta-item"><span class="post-meta-label">READ</span>{formatReadTime(thought.readTimeMinutes)}</span>
@@ -119,7 +121,7 @@ for (const thought of sorted) {
   /* ── Card grid ───────────────────────────────────────────────────────── */
   .thoughts-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 40px 20px;
   }
 
@@ -129,11 +131,10 @@ for (const thought of sorted) {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 10px 10px 60px 10px;
     background: var(--card-bg, white);
-    border-radius: 10px 10px 2px 2px;
     transition: background-color 0.25s ease, transform 0.25s ease;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
   }
 
   /* Perforated stamp edge along the bottom */
@@ -154,7 +155,6 @@ for (const thought of sorted) {
     aspect-ratio: 16 / 9;
     background: var(--color-taupe-300);
     overflow: hidden;
-    border-radius: 4px;
   }
 
   .post-cover--placeholder {
@@ -174,8 +174,10 @@ for (const thought of sorted) {
   .post-text {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: 8px;
-    padding: 12px 10px 0;
+    margin: 20px 20px 40px;
+    padding-top: 20px;
     border-top: 1px dashed color-mix(in srgb, var(--card-title, var(--color-taupe-300)) 35%, transparent);
   }
 
@@ -186,13 +188,13 @@ for (const thought of sorted) {
     letter-spacing: -0.44px;
     line-height: 1.2;
     color: var(--card-title, var(--color-orange-950));
-    margin: 0;
+    margin: 0 0 5px;
     transition: color 0.25s ease;
   }
 
   .post-excerpt {
     font-family: var(--font-uncut);
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: -0.14px;
     line-height: 1.35;
     color: color-mix(in srgb, var(--card-excerpt, var(--color-taupe-400)) 80%, var(--card-bg, white));
@@ -205,7 +207,7 @@ for (const thought of sorted) {
   .post-meta {
     display: flex;
     justify-content: space-between;
-    margin-top: 4px;
+    margin-top: 20px;
     padding-top: 8px;
     border-top: 1px dashed color-mix(in srgb, var(--card-title, var(--color-taupe-300)) 35%, transparent);
   }
@@ -263,8 +265,8 @@ for (const thought of sorted) {
     }
   }
 
-  /* ── Laptop ──────────────────────────────────────────────────────────── */
-  @media (max-width: 1280px) {
+  /* ── Super Big ──────────────────────────────────────────────────────────── */
+  @media (min-width: 1600px) {
     .thoughts-grid {
       grid-template-columns: repeat(3, 1fr);
     }

@@ -26,6 +26,13 @@ const resolvedOgImage = ogImage
   : `${Astro.url.origin}/images/SEOImage.png`;
 
 const currentPath = Astro.url.pathname;
+
+const navItems = [
+  { href: '/', label: 'Work' },
+  { href: '/about', label: 'About' },
+  { href: '/thoughts', label: 'Thoughts' },
+  { href: '/playlists', label: 'Playlists' },
+];
 ---
 
 <!doctype html>
@@ -56,14 +63,43 @@ const currentPath = Astro.url.pathname;
     <!-- Skip link: visually hidden, reveals on keyboard focus -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <div class="page-root">
-      <div class="page-layout">
-        <Sidebar currentPath={currentPath} />
-        <slot />
+    <!-- Push nav: sits behind the page-layer at z-index 5.
+         Must be a sibling of page-layer (not inside it) so position:fixed
+         isn't trapped inside the will-change:transform stacking context. -->
+    <nav class="push-nav" id="push-nav" aria-hidden="true">
+      <ul class="push-nav-links">
+        {navItems.map((item, i) => (
+          <li class="push-nav-item" style={`--i: ${i}`}>
+            <a
+              href={item.href}
+              class={`push-nav-link${currentPath === item.href ? ' push-nav-link--active' : ''}`}
+            >{item.label}</a>
+          </li>
+        ))}
+      </ul>
+      <div class="push-social">
+        <span class="push-social-label">Let's Talk</span>
+        <div class="push-social-links">
+          <a href="https://instagram.com/_isthatjeff" class="push-social-link" target="_blank" rel="noopener">Instagram</a>
+          <a href="https://linkedin.com/in/jeffrey-herrera" class="push-social-link" target="_blank" rel="noopener">LinkedIn</a>
+          <button class="push-social-link js-copy-email" type="button">Email</button>
+        </div>
       </div>
-    </div>
+    </nav>
 
-    <Footer />
+    <div class="page-layer" id="page-layer">
+      <!-- Tap-to-close overlay — only active when push nav is open -->
+      <div class="page-overlay" id="page-overlay"></div>
+
+      <div class="page-root">
+        <div class="page-layout">
+          <Sidebar currentPath={currentPath} />
+          <slot />
+        </div>
+      </div>
+
+      <Footer />
+    </div>
 
     <Cursor />
     <Analytics />
@@ -78,8 +114,8 @@ const currentPath = Astro.url.pathname;
 
   function initLenis() {
     lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      duration: 0.4,
+      easing: (t: number) => 1 - Math.pow(1 - t, 3),
     });
 
     function raf(time: number) {
@@ -150,11 +186,138 @@ const currentPath = Astro.url.pathname;
     top: 0;
   }
 
+  /* ── Push nav ────────────────────────────────────────────────────────────── */
+  .push-nav { display: none; }
+
+  @media (max-width: 1023px) {
+    .push-nav {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 5;
+      padding: 40px 28px 40px;
+    }
+
+    .push-nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .push-nav-item {
+      overflow: hidden;
+      padding-bottom: 0.1em;
+      margin-bottom: -0.1em;
+    }
+
+    .push-nav-link {
+      display: block;
+      font-family: var(--font-uncut);
+      font-size: 44px;
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      color: var(--color-orange-50);
+      text-decoration: none;
+      transform: translateY(110%);
+      transition: transform 0.25s ease;
+    }
+
+    .push-nav.is-open .push-nav-link {
+      transform: translateY(0);
+      transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: calc(100ms + var(--i, 0) * 80ms);
+    }
+
+    .push-social {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 30px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .push-nav.is-open .push-social {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: 430ms;
+    }
+
+    .push-social-label {
+      font-family: var(--font-uncut);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 247, 237, 0.5);
+    }
+
+    .push-social-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .push-social-link {
+      font-family: var(--font-uncut);
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--color-orange-50);
+      text-decoration: none;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+  }
+
   @media (max-width: 1023px) {
     .page-layout {
       grid-template-columns: 1fr;
       gap: 0;
-      padding-top: 80px; /* 40px top padding + 40px button height */
+    }
+
+    /* Mobile: body is orange — the push nav sits behind the cream page-layer */
+    :global(body) {
+      background: var(--color-orange-500);
+    }
+
+    /* Page layer slides down to reveal the orange nav behind it */
+    .page-layer {
+      position: relative;
+      z-index: 10;
+      background: var(--color-cream);
+      transform: translateY(0);
+      transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1),
+                  border-radius 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+      will-change: transform;
+      /* clip clips child backgrounds to rounded corners without creating
+         a scroll container (which would break position:sticky) */
+      overflow: clip;
+    }
+
+    .page-layer.is-open {
+      transform: translateY(var(--nav-height, 280px));
+      border-radius: 24px 24px 0 0;
+    }
+
+    /* Overlay captures taps on the page while the nav is open */
+    .page-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      cursor: pointer;
+    }
+
+    .page-layer.is-open .page-overlay {
+      display: block;
     }
   }
 

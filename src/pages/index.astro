@@ -72,17 +72,6 @@ const categories = [
       
     </div>
 
-    <!-- About blurb -->
-    <div class="about-zone row">
-      <div class="about-content">
-        <p class="about-text">
-          Currently Associate Creative Director of Brand &amp; Experiential / Competitive Cold Brew Drinker at Braze
-        </p>
-        <Button href="/about" variant="secondary" class="about-btn">
-          About <span>→</span>
-        </Button>
-      </div>
-    </div>
 
     <!-- Work sections -->
     <div class="work-sections">
@@ -281,16 +270,6 @@ const categories = [
     document.addEventListener('astro:before-swap', () => io.disconnect(), { once: true });
   }
 
-  // ── Magnetic about button ─────────────────────────────────────────────────
-  function initAboutMagnetic() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const btn = document.querySelector<HTMLElement>('.about-btn');
-    if (!btn) return;
-
-    const cleanup = initMagnetic(btn, { strength: 0.38, radiusMultiplier: 1.6 });
-    document.addEventListener('astro:before-swap', cleanup, { once: true });
-  }
-
   // ── Category count roll-up ────────────────────────────────────────────────
   function initCounts() {
     const counts = document.querySelectorAll<HTMLElement>('.category-count[data-count]');
@@ -464,7 +443,6 @@ const categories = [
     initProjectCards();
     initParallax();
     initActiveSections();
-    initAboutMagnetic();
     initCounts();
     initHeroCursorTrail();
   }
@@ -500,9 +478,10 @@ const categories = [
     align-items: center;
     grid-column: 1 / 8;
     align-content: flex-start;
-    padding-top: 112px;
+    padding-top: 96px;
     gap: 0 16px;
     min-height: 436px;
+    margin-bottom: 160px;
   }
 
   .word {
@@ -626,35 +605,6 @@ const categories = [
     pointer-events: none;
   }
 
-  /* ===== ABOUT ZONE ===== */
-  .about-zone {
-    margin-top: 60px;
-    margin-bottom: 160px;
-  }
-
-  .about-content {
-    grid-column: 1 / 6;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .about-text {
-    font-family: var(--font-uncut);
-    font-size: clamp(0.875rem, 3.5vw, 1.375rem);
-    letter-spacing: -0.36px;
-    line-height: 1.15;
-    color: var(--color-taupe-400);
-    margin: 0;
-    text-wrap: balance;
-  }
-
-  /* .about-btn styles live in Button.astro (variant="secondary") */
-  .about-btn {
-    will-change: transform;
-    transition: border-color 0.15s, color 0.15s, transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    width: fit-content;
-  }
 
   /* ===== WORK SECTIONS ===== */
   .work-sections {
@@ -853,7 +803,6 @@ const categories = [
     .project-link:hover .project-img        { scale: 1.13; }
     .project-link:hover .project-image::after { opacity: 0.2; }
     .project-link:hover .project-title      { color: var(--color-orange-500); }
-    /* .about-btn hover handled by Button.astro */
   }
 
   /* ── Reduced motion ──────────────────────────────────────────────────── */
@@ -899,14 +848,6 @@ const categories = [
       height: 36px;
     }
 
-    /* About zone */
-    .about-zone {
-      margin-bottom: 60px;
-    }
-
-    .about-content {
-      grid-column: 1 / -1;
-    }
 
     /* Stack paired projects into a single column */
     .project-row {
