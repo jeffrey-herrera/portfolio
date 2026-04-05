@@ -38,6 +38,18 @@ import Button from './Button.astro';
 
 <script>
   import { initMagnetic } from '../utils/magnetic.ts';
+  import { track } from '@vercel/analytics';
+
+  // ── Footer CTA analytics ──────────────────────────────────────────────────
+  function initFooterAnalytics() {
+    const cta = document.querySelector<HTMLAnchorElement>('.footer-cta');
+    if (!cta) return;
+    const onClick = () => { track('email_clicked'); };
+    cta.addEventListener('click', onClick);
+    document.addEventListener('astro:before-swap', () => {
+      cta.removeEventListener('click', onClick);
+    }, { once: true });
+  }
 
   // ── Footer parallax + magnetic CTA ────────────────────────────────────────
   function initFooterEffects() {
@@ -95,7 +107,9 @@ import Button from './Button.astro';
   }
 
   initFooterEffects();
+  initFooterAnalytics();
   document.addEventListener('astro:after-swap', initFooterEffects);
+  document.addEventListener('astro:after-swap', initFooterAnalytics);
 </script>
 
 <style>

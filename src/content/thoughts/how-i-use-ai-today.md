@@ -1,19 +1,21 @@
 ---
 title: "How I Use AI Today"
-description: "Speed is a side effect. Alignment is the win."
+description: "Earlier than you'd think, and not for finished work."
 publishedAt: 2024-12-05
 featured: false
-cover: /images/thoughts/example.webp
+cover: /images/thoughts/how-i-use-ai.webp
 ---
 
-Speed is a side effect. Alignment is the win.
+<mark>The most useful thing I've generated this year took about four minutes and nobody will ever see it.</mark>
 
-Most conversations about AI and creative work focus on what it can produce. Faster concepts. More variations. Automated production tasks. That's real, but it misses what I've found most valuable: using it to close the gap between what's in my head and what other people understand.
+Most people I know use AI at the end of the process, when the idea is already formed and the direction is basically decided. That's the least interesting place to use it. By then, everyone's already committed to something.
 
-Early in a project, I use it to articulate things I'd normally just feel my way through. I'll describe a brand or a design direction in rough terms and ask it to reflect back what it hears — where the contradictions are, what I'm not saying clearly, what assumptions I'm making. It's like having a very literal collaborator who takes everything at face value.
+There's a lot of anxiety right now about what AI means for creative work. I've been in enough rooms to know how real that feels. But the version of AI that worries people, the one replacing finished work, isn't where I've found the most value.
 
-That process surfaces misalignment before it gets expensive. Sometimes I discover I don't actually know what I mean. Sometimes I realize two things I thought were compatible are pulling in different directions. That's useful. It's much cheaper to find out in conversation than in execution.
+The real value shows up before anything is presented. Before work feels serious. That's when language is doing too much work and everyone is nodding at "elevated but approachable" while picturing entirely different things.
 
-I'm not using it to generate final work. I'm using it as a thinking partner for the part of creative work that's hardest to share: the internal reasoning that usually stays invisible until something goes wrong.
+What I actually use it for: getting work into context fast. A logo on a conference booth. A brand applied across a badge, a tote, a stage backdrop. Swag sitting in someone's hands instead of floating on a white artboard. These aren't finished assets. They're quick enough to be disposable, real enough that the room stops nodding and starts reacting.
 
-Speed is what people talk about. But the real value is clarity.
+Photography works the same way. A rough AI comp of a shot, the framing, the talent, the setting, lets stakeholders see the idea working before a single dollar goes to production. It's not about replacing the shoot. It's about walking in with a shared picture of what you're trying to make.
+
+<mark>Speed is a side effect. What actually matters is finding the gap before it gets expensive.</mark>

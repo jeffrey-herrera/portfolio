@@ -12,12 +12,15 @@ interface Props {
   /** Path from root (e.g. /images/work/cover.jpg) or full URL.
    *  Falls back to the default SEO image when omitted. */
   ogImage?: string;
+  /** Optional structured data to render as application/ld+json in <head>. */
+  jsonLd?: Record<string, unknown>;
 }
 
 const {
   title = 'Jeff Herrera — Creative Director',
   description = 'Jeff Herrera is a Creative Director based in NYC, crafting lasting brands across physical & digital.',
   ogImage,
+  jsonLd,
 } = Astro.props;
 
 // Resolve to absolute URL: pass-through if already absolute, else prepend origin
@@ -56,6 +59,25 @@ const navItems = [
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={resolvedOgImage} />
+
+    {Astro.site && (
+      <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />
+    )}
+    <link rel="alternate" type="application/rss+xml" title="Jeff Herrera — Thoughts" href="/rss.xml" />
+
+    <!-- Person JSON-LD — always present -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Jeff Herrera",
+      "url": "https://jeffherrera.com",
+      "jobTitle": "Product Designer",
+      "sameAs": []
+    })} />
+
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
 
   </head>
 
@@ -107,37 +129,8 @@ const navItems = [
 </html>
 
 <script>
-  import Lenis from 'lenis';
-
-  let lenis: Lenis | null = null;
-  let lenisRaf: number | null = null;
-
-  function initLenis() {
-    lenis = new Lenis({
-      duration: 0.4,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
-    });
-
-    function raf(time: number) {
-      lenis!.raf(time);
-      lenisRaf = requestAnimationFrame(raf);
-    }
-    lenisRaf = requestAnimationFrame(raf);
-
-    document.addEventListener('astro:before-swap', () => {
-      if (lenisRaf !== null) cancelAnimationFrame(lenisRaf);
-      lenis?.destroy();
-      lenis = null;
-      lenisRaf = null;
-    }, { once: true });
-  }
-
-  initLenis();
-  document.addEventListener('astro:after-swap', initLenis);
-
-  // Allow other components to trigger a smooth scroll via Lenis
   document.addEventListener('scroll-to-top', () => {
-    lenis?.scrollTo(0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 </script>
 

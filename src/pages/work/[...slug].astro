@@ -2,21 +2,38 @@
 import { getCollection } from 'astro:content';
 import Layout from '../../layouts/Layout.astro';
 import MainContent from '../../components/MainContent.astro';
-import RelatedProjects from '../../components/RelatedProjects.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
 import Tag from '../../components/Tag.astro';
-import BackLink from '../../components/BackLink.astro';
 import { Image } from 'astro:assets';
 
 export async function getStaticPaths() {
   const workEntries = await getCollection('work');
-  return workEntries.map(entry => ({
-    params: { slug: entry.slug },
-    props: { entry, allWork: workEntries },
-  }));
+  const sorted = [...workEntries]
+    .filter(e => e.data.publishedAt)
+    .sort((a, b) => b.data.publishedAt!.valueOf() - a.data.publishedAt!.valueOf());
+  return workEntries.map(entry => {
+    const idx = sorted.findIndex(e => e.slug === entry.slug);
+    const prevWork = idx < sorted.length - 1 ? sorted[idx + 1] : null;
+    const nextWork = idx > 0 ? sorted[idx - 1] : null;
+    return {
+      params: { slug: entry.slug },
+      props: { entry, prevWork, nextWork },
+    };
+  });
 }
 
-const { entry, allWork } = Astro.props;
+const { entry, prevWork, nextWork } = Astro.props;
 const { Content } = await entry.render();
+
+const workJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: entry.data.title,
+  description: entry.data.description,
+  datePublished: entry.data.publishedAt?.toISOString(),
+  creator: { '@type': 'Person', name: 'Jeff Herrera' },
+  url: new URL(`/work/${entry.slug}`, Astro.site).href,
+};
 ---
 
 <!-- Thin reading progress bar pinned to top of viewport -->
@@ -25,12 +42,13 @@ const { Content } = await entry.render();
 <Layout
   title={`${entry.data.title} — Jeff Herrera`}
   description={entry.data.description}
-  ogImage={entry.data.cover}
+  ogImage={`/og/work/${entry.slug}.png`}
+  jsonLd={workJsonLd}
 >
   <MainContent>
     <div class="page-inner">
 
-      <BackLink href="/" label="Work" />
+      <Breadcrumb crumbs={[{ label: 'Work', href: '/' }, { label: entry.data.title }]} />
 
       <header class="work-header">
         <!-- work-title is intentionally a local <h1> — it uses different sizing
@@ -66,7 +84,50 @@ const { Content } = await entry.render();
         <Content />
       </div>
 
-      <RelatedProjects current={entry} allWork={allWork} />
+      {(prevWork || nextWork) && (
+        <nav class="work-nav-strip" aria-label="More work">
+          {prevWork && (
+            <a
+              href={`/work/${prevWork.slug}`}
+              class="work-nav-item work-nav-item--prev"
+              data-cursor-label="View Project"
+            >
+              <span class="work-nav-dir">← Previous</span>
+              {prevWork.data.cover && (
+                <Image
+                  src={prevWork.data.cover}
+                  alt={prevWork.data.title}
+                  width={400}
+                  height={250}
+                  class="work-nav-cover"
+                  loading="lazy"
+                />
+              )}
+              <span class="work-nav-title">{prevWork.data.title}</span>
+            </a>
+          )}
+          {nextWork && (
+            <a
+              href={`/work/${nextWork.slug}`}
+              class="work-nav-item work-nav-item--next"
+              data-cursor-label="View Project"
+            >
+              <span class="work-nav-dir">Next →</span>
+              {nextWork.data.cover && (
+                <Image
+                  src={nextWork.data.cover}
+                  alt={nextWork.data.title}
+                  width={400}
+                  height={250}
+                  class="work-nav-cover"
+                  loading="lazy"
+                />
+              )}
+              <span class="work-nav-title">{nextWork.data.title}</span>
+            </a>
+          )}
+        </nav>
+      )}
 
     </div>
   </MainContent>
@@ -179,6 +240,68 @@ const { Content } = await entry.render();
   .work-body :global(a:hover) {
     text-decoration: underline;
   }
+
+  /* ── Prev / Next work strip ──────────────────────────────────────────────── */
+  .work-nav-strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 80px;
+    padding-top: 40px;
+    border-top: 1px solid var(--color-taupe-300);
+  }
+
+  .work-nav-item {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: transparent;
+    transition: opacity 0.2s;
+  }
+
+  .work-nav-item:hover {
+    opacity: 0.8;
+  }
+
+  .work-nav-cover {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    background: var(--color-taupe-300);
+  }
+
+  .work-nav-item--next {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .work-nav-dir {
+    font-family: var(--font-uncut);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-taupe-400);
+  }
+
+  .work-nav-title {
+    font-family: var(--font-uncut);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    color: var(--color-orange-950);
+  }
+
+  @media (max-width: 1023px) {
+    .work-nav-strip {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
 
 <script>
@@ -186,10 +309,20 @@ const { Content } = await entry.render();
     const bar = document.getElementById('reading-progress') as HTMLElement | null;
     if (!bar) return;
 
+    let hasReported50 = false;
+
     const onScroll = () => {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
       bar.style.width = `${Math.min(100, pct)}%`;
+
+      if (!hasReported50 && pct >= 50) {
+        hasReported50 = true;
+        import('@vercel/analytics').then(({ track }) => {
+          const slug = window.location.pathname.split('/').filter(Boolean).pop() ?? '';
+          track('read_milestone', { slug, pct: 50 });
+        }).catch(() => {});
+      }
     };
 
     window.addEventListener('scroll', onScroll, { passive: true });

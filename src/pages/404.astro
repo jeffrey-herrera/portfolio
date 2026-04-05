@@ -1,0 +1,208 @@
+---
+// Standalone 404 — no sidebar layout
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Jeff Herrera</title>
+  <meta name="description" content="Great taste. Wrong turn." />
+  <meta name="robots" content="noindex" />
+  <style>
+    @font-face {
+      font-family: 'Uncut Sans';
+      src: url('/fonts/UncutSans-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Uncut Sans';
+      src: url('/fonts/UncutSans-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'PP Fragment';
+      src: url('/fonts/PPFragment-SerifRegular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; }
+    html, body { height: 100%; }
+
+    body {
+      /* Warm dark base — matches orange-950 palette so screen-blend GIF
+         picks up the site's brand warmth rather than cold black */
+      background: #1c0700;
+      font-family: 'Uncut Sans', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Background GIF ────────────────────────────────────────────── */
+    .bg-gif {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0.6;
+      /* screen: dark areas go transparent, bright areas add to the warm bg */
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    /* Warm orange tint layer — sits between GIF and content,
+       pulls everything toward the site's cream/orange palette */
+    .bg-tint {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(
+        ellipse at 50% 60%,
+        rgba(255, 105, 0, 0.18) 0%,
+        rgba(28, 7, 0, 0.55) 100%
+      );
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── Main centered content ─────────────────────────────────────── */
+    .center {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 48px 32px;
+    }
+
+    /* ── The number ────────────────────────────────────────────────── */
+    .number {
+      font-family: 'PP Fragment', Georgia, serif;
+      font-size: clamp(120px, 18vw, 220px);
+      font-weight: 400;
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: #eee5dd;
+      /* 1: drop in from above  2: slow ambient drift  3: periodic chromatic glitch */
+      animation:
+        fall-in  0.9s cubic-bezier(0.16, 1, 0.3, 1) both,
+        drift    5s   ease-in-out 0.9s infinite alternate,
+        chroma   7s   ease-in-out 1.2s infinite;
+    }
+
+    /* ── Copy ──────────────────────────────────────────────────────── */
+    .label {
+      margin-top: 32px;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(238, 229, 221, 0.55);
+      max-width: 480px;
+      animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+    }
+
+    /* ── Button ────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 40px;
+      padding: 14px 28px;
+      background: #ff6900;
+      color: #fff7ed;
+      font-family: 'Uncut Sans', system-ui, sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.1px;
+      text-decoration: none;
+      border-radius: 999px;
+      animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
+      transition: background 0.2s ease, transform 0.2s ease, gap 0.2s ease;
+    }
+    .btn:hover {
+      background: #e55e00;
+      transform: translateY(-2px);
+      gap: 12px;
+    }
+    .btn-arrow {
+      display: inline-block;
+      transition: transform 0.2s ease;
+    }
+    .btn:hover .btn-arrow {
+      transform: translateX(-3px);
+    }
+
+    /* ── Animations ────────────────────────────────────────────────── */
+    @keyframes fall-in {
+      from { opacity: 0; transform: translateY(-48px); }
+      to   { opacity: 1; transform: translateY(0);     }
+    }
+
+    @keyframes drift {
+      from { transform: translateY(0);    }
+      to   { transform: translateY(14px); }
+    }
+
+    /* Chromatic aberration — RGB split fires briefly every 7s */
+    @keyframes chroma {
+      0%, 70%, 100% {
+        text-shadow: none;
+        opacity: 1;
+      }
+      73% {
+        text-shadow: -6px 0 rgba(255, 105, 0, 0.8), 6px 0 rgba(166, 230, 219, 0.8);
+        opacity: 0.92;
+      }
+      76% {
+        text-shadow: 5px 0 rgba(255, 105, 0, 0.6), -5px 0 rgba(166, 230, 219, 0.6);
+        opacity: 0.96;
+      }
+      79% {
+        text-shadow: -3px 0 rgba(255, 105, 0, 0.4), 3px 0 rgba(166, 230, 219, 0.4);
+        opacity: 0.98;
+      }
+      82% {
+        text-shadow: none;
+        opacity: 1;
+      }
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .number { animation: none; }
+      .label, .btn { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <img
+    src="/images/404-bg.gif"
+    alt=""
+    aria-hidden="true"
+    class="bg-gif"
+  />
+  <div class="bg-tint" aria-hidden="true"></div>
+
+  <main class="center">
+    <div class="number" aria-label="404">404</div>
+    <p class="label">Great taste, wrong turn. Let's get you somewhere worth seeing.</p>
+    <a href="/" class="btn">
+      <span class="btn-arrow">←</span>
+      Back to the site
+    </a>
+  </main>
+</body>
+</html>

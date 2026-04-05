@@ -48,15 +48,6 @@ const categories = [
       <span class="word-clip" style="--i:7"><span class="word word--sans word--orange">in</span></span>
       <span class="word-clip" style="--i:8"><span class="word word--sans word--orange">NYC,</span></span>
 
-      <!-- NYC pill
-      <span class="hero-pill hero-entrance" style="--i:9">
-        <span class="hero-pill__shadow">
-          <img src="/nyc.jpg" alt="" aria-hidden="true" class="pill-nyc-img" />
-        </span>
-        <span class="hero-pill__main">
-          <img src="/nyc.jpg" alt="NYC" class="pill-nyc-img" />
-        </span>
-      </span> -->
       <br>
 
       <!-- Serif words -->
@@ -75,10 +66,6 @@ const categories = [
 
     <!-- Work sections -->
     <div class="work-sections">
-
-      <!-- <h2 class="work-heading">
-        <span class="reveal-outer"><span class="reveal-inner">Selected Work &darr;</span></span>
-      </h2> -->
 
       {categories.map((category) => (
         <div id={category.name.toLowerCase()} class="category-card">
@@ -594,18 +581,6 @@ const categories = [
     pointer-events: none;
   }
 
-  /* NYC photo — fills pill */
-  .pill-nyc-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    max-width: none;
-    pointer-events: none;
-  }
-
-
   /* ===== WORK SECTIONS ===== */
   .work-sections {
     display: flex;
@@ -620,17 +595,6 @@ const categories = [
     overflow: hidden;
   }
 
-  /* Section entry header — large editorial serif */
-  .work-heading {
-    font-family: var(--font-uncut);
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    line-height: 1;
-    color: var(--color-taupe-300);
-    font-feature-settings: 'ss03' 1, 'ss04' 1, 'dlig' 1;
-    margin: 0 0 48px 0;
-  }
 
   /* Category sections */
   .category-card {
@@ -701,8 +665,8 @@ const categories = [
     transform: translateY(40px);
     will-change: opacity, transform;
     transition:
-      opacity   0.65s ease,
-      transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity   0.8s cubic-bezier(0.25, 0, 0, 1),
+      transform 0.8s cubic-bezier(0.25, 0, 0, 1);
     transition-delay: var(--enter-delay, 0ms);
   }
 

@@ -232,32 +232,43 @@
 </style>
 
 <script>
+  // Module-level position — persists across view transitions so cursor
+  // never jumps back to (0,0) after a navigation or click.
+  let savedX = -200;
+  let savedY = -200;
+  let hasMoved = false;
+
   function initCursor() {
-    // Only run on real pointer devices (mouse / trackpad)
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
     const cursor = document.getElementById('cursor')       as HTMLElement | null;
     const label  = document.getElementById('cursor-label') as HTMLElement | null;
     if (!cursor || !label) return;
 
-    // Start well off-screen so the dot never flashes at (0,0)
-    let mouseX = -200, mouseY = -200;
-    let cursorX = -200, cursorY = -200;
-    const LERP = 0.35; // fraction of distance closed per frame
-    const HALF = 6;    // half of 12px dot — used to center dot on pointer
+    const LERP = 0.35;
+    const HALF = 6;
+    let mouseX = savedX, mouseY = savedY;
+    let cursorX = savedX, cursorY = savedY;
     let rafId: ReturnType<typeof requestAnimationFrame>;
 
-    // ── Reveal on first pointer move ────────────────────────────────────
-    const onFirstMove = () => {
+    // ── Reveal: immediately if we already have a position, else wait ─────
+    if (hasMoved) {
       cursor.classList.add('is-visible');
-      document.removeEventListener('mousemove', onFirstMove);
-    };
-    document.addEventListener('mousemove', onFirstMove);
+    } else {
+      const onFirstMove = () => {
+        cursor.classList.add('is-visible');
+        document.removeEventListener('mousemove', onFirstMove);
+      };
+      document.addEventListener('mousemove', onFirstMove);
+    }
 
     // ── Raw pointer tracking ─────────────────────────────────────────────
     const onMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX;
       mouseY = e.clientY;
+      savedX = mouseX;
+      savedY = mouseY;
+      hasMoved = true;
     };
     document.addEventListener('mousemove', onMouseMove);
 
@@ -268,7 +279,6 @@
     document.addEventListener('mouseenter', onDocEnter);
 
     // ── Hover state ──────────────────────────────────────────────────────
-    // Re-evaluated on every mouseover so child elements of links work too.
     const onMouseOver = (e: MouseEvent) => {
       const target = (e.target as Element).closest<HTMLElement>(
         'a, button, [role="button"], [data-cursor-type]'
@@ -302,7 +312,6 @@
     const tick = () => {
       cursorX += (mouseX - cursorX) * LERP;
       cursorY += (mouseY - cursorY) * LERP;
-      // translate3d forces GPU compositing layer
       cursor.style.transform =
         `translate3d(${cursorX - HALF}px, ${cursorY - HALF}px, 0)`;
       rafId = requestAnimationFrame(tick);
@@ -312,10 +321,9 @@
     // ── Cleanup before View Transition swap ──────────────────────────────
     document.addEventListener('astro:before-swap', () => {
       cancelAnimationFrame(rafId);
-      cursor.classList.remove('is-hovering', 'has-label', 'is-drag', 'is-visible');
+      cursor.classList.remove('is-hovering', 'has-label', 'is-drag');
       label.textContent = '';
       document.removeEventListener('mousemove',  onMouseMove);
-      document.removeEventListener('mousemove',  onFirstMove);
       document.removeEventListener('mouseover',  onMouseOver);
       document.removeEventListener('mouseleave', onDocLeave);
       document.removeEventListener('mouseenter', onDocEnter);
