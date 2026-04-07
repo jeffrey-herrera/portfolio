@@ -474,22 +474,20 @@ const categories = [
   .word {
     white-space: nowrap;
     line-height: 1.15;
-    /* Fluid from 24px on small phones up to 80px at desktop.
-       letter-spacing in em so it scales proportionally. */
-    font-size: clamp(2rem, 5.5vw, 5rem);
-    letter-spacing: -0.014em;
+    font-size: clamp(2rem, 4.5vw, 6rem);
   }
 
   .word--sans {
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-weight: 700;
     text-transform: uppercase;
-    font-feature-settings: 'ordn' 1, 'dlig' 1;
+    font-feature-settings: 'ordn' 1, 'dlig' 1, 'ss02' 1, 'ss03' 1, 'ss08' 1;
   }
 
   .word--serif {
     font-family: var(--font-fragment);
     font-weight: 400;
+    letter-spacing: -0.014em;
     font-feature-settings: 'ordn' 1, 'ss04' 1, 'ss03' 1, 'dlig' 1;
   }
 
@@ -533,8 +531,9 @@ const categories = [
 
   .hero-pill {
     display: inline-flex;
-    width: 130px;
-    height: 64px;
+    font-size: clamp(2rem, 5vw, 6rem); /* match .word so 1cap resolves correctly */
+    height: 1cap;
+    width: calc(1cap * 2.05); /* preserve ~2:1 pill aspect ratio */
     flex-shrink: 0;
     position: relative;
     vertical-align: middle;
@@ -634,15 +633,14 @@ const categories = [
   }
 
   .category-count {
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: 12px;
-    letter-spacing: -0.2px;
     line-height: 1;
     color: var(--color-orange-500);
   }
 
   .empty-state {
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: 14px;
     color: var(--color-taupe-400);
     text-align: center;
@@ -748,7 +746,7 @@ const categories = [
     align-items: center;
     gap: 8px;
     line-height: 1.15;
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
   }
 
   .project-title {
@@ -800,17 +798,18 @@ const categories = [
       min-height: auto;
       grid-column: 1 / -1;
       gap: 8px;
+      margin-bottom: 80px;
     }
 
     .hero-text br {
       display: none;
     }
 
-    /* Portrait pill: scale to sit flush with 1.5rem line-height (~28px) */
     .hero-pill {
-      width: 80px;
-      height: 36px;
+      height: 1.25cap;
+      width: calc(1.25cap * 2.05);
     }
+
 
 
     /* Stack paired projects into a single column */

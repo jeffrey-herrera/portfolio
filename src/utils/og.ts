@@ -17,8 +17,8 @@ let fontBold: Buffer;
 let fontRegular: Buffer;
 
 try {
-  fontBold    = readFileSync(join(ROOT, 'public/fonts/UncutSans-Bold.otf'));
-  fontRegular = readFileSync(join(ROOT, 'public/fonts/UncutSans-Regular.otf'));
+  fontBold    = readFileSync(join(ROOT, 'public/fonts/PPRadioGrotesk-Black.woff2'));
+  fontRegular = readFileSync(join(ROOT, 'public/fonts/PPRadioGrotesk-Regular.woff2'));
 } catch {
   // Fonts missing — OG generation will fall back to system fonts
   fontBold    = Buffer.alloc(0);
@@ -26,8 +26,8 @@ try {
 }
 
 export const fontConfig = [
-  { name: 'Uncut Sans', data: fontBold,    weight: 700 as const, style: 'normal' as const },
-  { name: 'Uncut Sans', data: fontRegular, weight: 400 as const, style: 'normal' as const },
+  { name: 'PP Radio Grotesk', data: fontBold,    weight: 700 as const, style: 'normal' as const },
+  { name: 'PP Radio Grotesk', data: fontRegular, weight: 400 as const, style: 'normal' as const },
 ];
 
 export async function getFontConfig() { return fontConfig; }

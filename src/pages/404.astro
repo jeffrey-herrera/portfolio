@@ -11,15 +11,15 @@
   <meta name="robots" content="noindex" />
   <style>
     @font-face {
-      font-family: 'Uncut Sans';
-      src: url('/fonts/UncutSans-Regular.woff2') format('woff2');
+      font-family: 'PP Radio Grotesk';
+      src: url('/fonts/PPRadioGrotesk-Regular.woff2') format('woff2');
       font-weight: 400;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
-      font-family: 'Uncut Sans';
-      src: url('/fonts/UncutSans-Bold.woff2') format('woff2');
+      font-family: 'PP Radio Grotesk';
+      src: url('/fonts/PPRadioGrotesk-Black.woff2') format('woff2');
       font-weight: 700;
       font-style: normal;
       font-display: swap;
@@ -39,8 +39,9 @@
       /* Warm dark base — matches orange-950 palette so screen-blend GIF
          picks up the site's brand warmth rather than cold black */
       background: #1c0700;
-      font-family: 'Uncut Sans', system-ui, sans-serif;
+      font-family: 'PP Radio Grotesk', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
+      font-feature-settings: 'ss02' 1, 'ss03' 1, 'ss08' 1;
     }
 
     /* ── Background GIF ────────────────────────────────────────────── */
@@ -119,10 +120,9 @@
       padding: 14px 28px;
       background: #ff6900;
       color: #fff7ed;
-      font-family: 'Uncut Sans', system-ui, sans-serif;
+      font-family: 'PP Radio Grotesk', system-ui, sans-serif;
       font-size: 14px;
       font-weight: 600;
-      letter-spacing: -0.1px;
       text-decoration: none;
       border-radius: 999px;
       animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;

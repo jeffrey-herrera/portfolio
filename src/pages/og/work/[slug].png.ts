@@ -26,7 +26,7 @@ export const GET: APIRoute = async ({ props }) => {
         flexDirection: 'column',
         width: 1200,
         height: 630,
-        fontFamily: 'Uncut Sans',
+        fontFamily: 'PP Radio Grotesk',
         background: '#ada09c',
         overflow: 'hidden',
       },

@@ -16,7 +16,7 @@ export const GET: APIRoute = async () => {
         background: '#c9303e',
         color: '#bfffe6',
         fontSize: 80,
-        fontFamily: 'Uncut Sans',
+        fontFamily: 'PP Radio Grotesk',
         fontWeight: 700,
         alignItems: 'center',
         justifyContent: 'center',

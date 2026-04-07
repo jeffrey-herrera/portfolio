@@ -94,7 +94,7 @@ const articleJsonLd = {
     border-radius: 10px 10px 2px 2px;
     overflow: hidden;
     position: relative;
-    margin-bottom: 80px;
+    margin-bottom: 60px;
   }
 
   /* Perforated bottom edge */
@@ -130,26 +130,25 @@ const articleJsonLd = {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    text-wrap: balance;
     gap: 12px;
   }
 
   .ticket-title {
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: clamp(28px, 3vw, 48px);
     font-weight: 700;
-    letter-spacing: -0.03em;
     line-height: 1.1;
     color: var(--card-title);
-    margin-bottom: 20px;
-    /* margin: 0; */
+    margin-bottom: 10px;
   }
 
   .ticket-desc {
-    font-family: var(--font-uncut);
-    font-size: clamp(14px, 1.2vw, 24px);
+    font-family: var(--font-sans);
+    font-size: clamp(14px, 1.5vw, 24px);
     line-height: 1.45;
     color: color-mix(in srgb, var(--card-title) 70%, var(--card-bg));
-    margin: 0;
+    margin: 0 0 20px 0;
     text-wrap: balance;
   }
 
@@ -161,7 +160,7 @@ const articleJsonLd = {
     margin-top: 8px;
     padding-top: 12px;
     border-top: 1px dashed color-mix(in srgb, var(--card-title) 30%, var(--card-bg));
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: 10px;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -182,15 +181,15 @@ const articleJsonLd = {
 
   /* ── Body — no container, sits on page bg ────────────────────────────── */
   .thought-body {
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: 19px;
     line-height: 1.7;
     color: var(--color-orange-950);
-    max-width: 760px;
+    /* max-width: 760px; */
   }
 
   .thought-body :global(h2) {
-    font-family: var(--font-fragment);
+    font-family: var(--font-sans);
     font-size: 28px;
     letter-spacing: -0.56px;
     color: var(--color-orange-950);
@@ -216,13 +215,13 @@ const articleJsonLd = {
   .thought-body :global(p:has(> mark)) {
     background: none;
     margin-top: 8px;
-    margin-bottom: 64px;
+    margin-bottom: 40px;
   }
 
   .thought-body :global(mark) {
     background: none;
-    font-family: var(--font-fragment);
-    font-size: 30px;
+    font-family: var(--font-sans);
+    font-size: 28px;
     line-height: 1.35;
     color: var(--color-orange-950);
     display: block;
@@ -231,7 +230,7 @@ const articleJsonLd = {
   /* Closing mark — <p> containing <mark> that follows body copy */
   .thought-body :global(p + p:has(> mark)),
   .thought-body :global(ul + p:has(> mark)) {
-    margin-top: 64px;
+    margin-top: 40px;
     margin-bottom: 8px;
   }
 
@@ -286,7 +285,7 @@ const articleJsonLd = {
     border-radius: 999px;
     border: 1px solid color-mix(in srgb, var(--card-title) 35%, var(--card-bg));
     background: transparent;
-    font-family: var(--font-uncut);
+    font-family: var(--font-sans);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.08em;

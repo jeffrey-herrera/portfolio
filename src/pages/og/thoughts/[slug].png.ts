@@ -44,7 +44,7 @@ export const GET: APIRoute = async ({ props }) => {
         display: 'flex',
         width: 1200,
         height: 630,
-        fontFamily: 'Uncut Sans',
+        fontFamily: 'PP Radio Grotesk',
         position: 'relative',
         overflow: 'hidden',
         background: palette.bg,
